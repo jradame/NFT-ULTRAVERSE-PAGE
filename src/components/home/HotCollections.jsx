@@ -1,19 +1,61 @@
+// src/components/home/HotCollections.jsx
+
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
-
-// Local fallback images
-import AuthorImage from "../../images/author_thumbnail.jpg";
-import nftImage from "../../images/nftImage.jpg";
-import "../../css/styles/style.css"; // ✅ correct
-
-
-
+import "../../css/styles/style.css";
 
 const HotCollections = () => {
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Sample names and prices to match your desired output
+  const sampleOwners = [
+    "Gayle Hicks",
+    "Marcus Johnson", 
+    "Sarah Chen",
+    "David Wilson",
+    "Emma Rodriguez",
+    "Alex Turner"
+  ];
+
+  const sampleCreators = [
+    "Jimmy Wright",
+    "Lisa Park",
+    "Ryan Mitchell",
+    "Maya Patel",
+    "Chris Anderson",
+    "Jordan Lee"
+  ];
+
+  const samplePrices = ["0.29", "1.45", "0.87", "2.13", "0.64", "1.92"];
+
+  // Sample views and likes arrays
+  const sampleViews = [1250, 892, 2104, 756, 1876, 1432];
+  const sampleLikes = [89, 156, 234, 67, 198, 123];
+
+  // Random NFT IDs like #942, #3847, etc.
+  const sampleNFTIds = [3, 942, 1537, 8291, 456, 7623];
+
+  // Different profile images for owners and creators
+  const ownerProfileImages = [
+    "https://i.pravatar.cc/150?img=1",
+    "https://i.pravatar.cc/150?img=3",
+    "https://i.pravatar.cc/150?img=5",
+    "https://i.pravatar.cc/150?img=7",
+    "https://i.pravatar.cc/150?img=9",
+    "https://i.pravatar.cc/150?img=11"
+  ];
+
+  const creatorProfileImages = [
+    "https://i.pravatar.cc/150?img=2",
+    "https://i.pravatar.cc/150?img=4",
+    "https://i.pravatar.cc/150?img=6",
+    "https://i.pravatar.cc/150?img=8",
+    "https://i.pravatar.cc/150?img=10",
+    "https://i.pravatar.cc/150?img=12"
+  ];
 
   const [sliderRef, slider] = useKeenSlider({
     loop: true,
@@ -34,13 +76,13 @@ const HotCollections = () => {
   useEffect(() => {
     const fetchCollections = async () => {
       try {
-        const response = await fetch(
+        const res = await fetch(
           "https://us-central1-nft-cloud-functions.cloudfunctions.net/hotCollections"
         );
-        const data = await response.json();
+        const data = await res.json();
         setCollections(data);
-      } catch (error) {
-        console.error("Error fetching collections:", error);
+      } catch (err) {
+        console.error("Failed to load collections", err);
       } finally {
         setLoading(false);
       }
@@ -65,60 +107,85 @@ const HotCollections = () => {
           ) : (
             <>
               <div ref={sliderRef} className="keen-slider">
-                {collections.slice(0, 6).map((collection, index) => (
-                  <div className="keen-slider__slide" key={index}>
-                    <div className="nft_coll">
-                      <div className="nft_wrap">
-                        <Link to="/item-details">
-                          <img
-                            src={collection.nftImage || nftImage}
-                            className="lazy img-fluid"
-                            alt={collection.title || "NFT"}
-                          />
-                        </Link>
-                      </div>
-                      <div className="nft_coll_pp">
-                        <Link to="/author">
-                          <img
-                            className="lazy pp-coll"
-                            src={collection.authorImage || AuthorImage}
-                            alt={collection.name || "Author"}
-                          />
-                        </Link>
-                        <i className="fa fa-check"></i>
-                      </div>
-                      <div className="nft_coll_info">
-                        <Link to="/explore">
-                          <h4>{collection.title}</h4>
-                        </Link>
-                        <span>{collection.code}</span>
+                {collections.slice(0, 6).map((collection, index) => {
+                  const stateData = {
+                    collection: {
+                      ...collection,
+                      // Override the id with random numbers
+                      id: sampleNFTIds[index % sampleNFTIds.length],
+                      // Use sample names and prices that rotate through the arrays
+                      authorName: sampleOwners[index % sampleOwners.length],
+                      creatorName: sampleCreators[index % sampleCreators.length],
+                      authorImage: ownerProfileImages[index % ownerProfileImages.length],
+                      creatorImage: creatorProfileImages[index % creatorProfileImages.length],
+                      price: samplePrices[index % samplePrices.length],
+                      // Use sample views and likes
+                      views: sampleViews[index % sampleViews.length],
+                      likes: sampleLikes[index % sampleLikes.length],
+                    },
+                  };
+
+                  return (
+                    <div className="keen-slider__slide" key={index}>
+                      <div className="nft_coll">
+                        <div className="nft_wrap">
+                          <Link to={`/item-details/${sampleNFTIds[index % sampleNFTIds.length]}`} state={stateData}>
+                            <img
+                              src={collection.nftImage}
+                              className="lazy img-fluid"
+                              alt={collection.title}
+                            />
+                          </Link>
+                        </div>
+                        <div className="nft_coll_pp position-relative">
+                          <Link to={`/item-details/${sampleNFTIds[index % sampleNFTIds.length]}`} state={stateData}>
+                            <img
+                              className="lazy pp-coll"
+                              src={ownerProfileImages[index % ownerProfileImages.length]}
+                              alt={sampleOwners[index % sampleOwners.length]}
+                            />
+                          </Link>
+                          <i 
+                            className="fa fa-check position-absolute"
+                            style={{
+                              bottom: "0px",
+                              right: "0px",
+                              backgroundColor: "white",
+                              borderRadius: "50%",
+                              fontSize: "12px",
+                              padding: "2px",
+                              color: "#007bff"
+                            }}
+                          ></i>
+                        </div>
+                        <div className="nft_coll_info">
+                          <Link to={`/item-details/${sampleNFTIds[index % sampleNFTIds.length]}`} state={stateData}>
+                            <h4>{collection.title}</h4>
+                          </Link>
+                          <span>{collection.code}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
-              {/* ✅ RIGHT ARROW ONLY */}
-           <button
-  className="slider-arrow next-arrow"
-  onClick={() => slider.current?.next()}
-  aria-label="Next Slide"
->
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <polyline points="9 18 15 12 9 6" />
-  </svg>
-</button>
-
+              {/* Right Arrow */}
+              <button
+                className="slider-arrow next-arrow"
+                onClick={() => slider.current?.next()}
+                aria-label="Next Slide"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M8 5L15 12L8 19"
+                    stroke="black"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
             </>
           )}
         </div>
@@ -128,5 +195,17 @@ const HotCollections = () => {
 };
 
 export default HotCollections;
+
+
+
+
+
+
+
+
+
+
+
+
 
 

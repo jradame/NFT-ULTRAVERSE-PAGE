@@ -14,6 +14,7 @@ const Nav = () => {
 
   return (
     <header className="transparent header-light scroll-light smaller">
+      
       <div className="container">
         <div className="row">
           <div className="col-md-12">
@@ -22,7 +23,7 @@ const Nav = () => {
                 <div className="de-flex-col">
                   <div id="logo">
                     <Link to="/">
-                      <img alt="" className="logo-2" src={Logo} />
+                      <img alt="Ultraverse NFT World" className="logo-2" src={Logo} />
                     </Link>
                   </div>
                 </div>
@@ -38,14 +39,34 @@ const Nav = () => {
               </div>
               <div className="de-flex-col header-col-mid">
                 <ul id="mainmenu">
-                  <li className="menu-item-has-children has-child">
+                  <li>
                     <Link to="/">
-                      Home<span></span>
+                      Home
                     </Link>
                   </li>
-                  <li className="menu-item-has-children has-child">
+                  <li>
                     <Link to="/explore">
-                      Explore<span></span>
+                      Explore
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="#" className="no-cursor">
+                      Activity
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="#" className="no-cursor">
+                      Stats
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="#" className="no-cursor">
+                      Resources
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="#" className="no-cursor">
+                      Create
                     </Link>
                   </li>
                   <li>
@@ -81,6 +102,38 @@ const Nav = () => {
             Explore
           </Link>
         </li>
+        <li className="dropdown__list">
+          <Link to="#" onClick={() => closeNav()}>
+            Activity
+          </Link>
+        </li>
+        <li className="dropdown__list">
+          <Link to="#" onClick={() => closeNav()}>
+            Stats
+          </Link>
+        </li>
+        <li className="dropdown__list">
+          <Link to="#" onClick={() => closeNav()}>
+            Resources
+          </Link>
+        </li>
+        <li className="dropdown__list">
+          <Link to="#" onClick={() => closeNav()}>
+            Create
+          </Link>
+        </li>
+        <li className="dropdown__list">
+          <Link
+            to="#"
+            className="btn-main connect-wallet"
+            onClick={() => {
+              closeNav();
+              alert("This feature has not been implemented yet");
+            }}
+          >
+            Connect wallet
+          </Link>
+        </li>
         <li className="close__button">
           <button onClick={() => closeNav()}>
             <FaTimes />
@@ -92,3 +145,4 @@ const Nav = () => {
 };
 
 export default Nav;
+

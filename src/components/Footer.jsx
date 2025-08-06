@@ -158,8 +158,8 @@ const Footer = () => {
               <div className="de-flex footer__wrapper">
                 <div className="de-flex-col">
                   <Link className="footer__link" to="/">
-                    <img alt="" className="f-logo" src={Logo} />
-                    <span className="copy">&copy; Copyright 2022</span>
+                    <img alt="Ultraverse NFT World" className="f-logo" src={Logo} />
+                    <span className="copy">&copy; Copyright 2025</span>
                   </Link>
                 </div>
               </div>
@@ -172,3 +172,4 @@ const Footer = () => {
 };
 
 export default Footer;
+

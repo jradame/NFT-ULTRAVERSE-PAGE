@@ -1,4 +1,6 @@
 import React, { useEffect } from "react";
+import Nav from "../components/Nav";
+import Footer from "../components/Footer";
 import BrowseByCategory from "../components/home/BrowseByCategory";
 import HotCollections from "../components/home/HotCollections";
 import Landing from "../components/home/Landing";
@@ -13,6 +15,7 @@ const Home = () => {
 
   return (
     <div id="wrapper">
+      <Nav />
       <div className="no-bottom no-top" id="content">
         <div id="top"></div>
         <Landing />
@@ -22,8 +25,10 @@ const Home = () => {
         <TopSellers />
         <BrowseByCategory />
       </div>
+      <Footer />
     </div>
   );
 };
 
 export default Home;
+
