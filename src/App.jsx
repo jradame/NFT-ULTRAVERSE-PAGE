@@ -12,7 +12,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/explore" element={<Explore />} />
-        <Route path="/author" element={<Author />} />
+        <Route path="/author/:id" element={<Author />} /> {/* ✅ ADD :id parameter */}
         <Route path="/item-details/:id" element={<ItemDetails />} />
         <Route path="*" element={<h2>404 Not Found</h2>} />
       </Routes>
@@ -21,6 +21,7 @@ function App() {
 }
 
 export default App;
+
 
 
 

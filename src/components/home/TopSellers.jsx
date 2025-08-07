@@ -1,29 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { USERS_DATA } from "../../data/userData"; // ✅ Import centralized data
 
 const TopSellers = () => {
   const [sellers, setSellers] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const sampleSellerNames = [
-    "Monica Lucas", "Lori Hart", "Gayle Hicks", "Stacy Long",
-    "Mamie Barnett", "Jimmy Wright", "Claude Banks", "Ida Chapman",
-    "Fred Ryan", "Nicholas Daniels", "Karla Sharp", "Franklin Greer"
-  ];
-
-  const sellerProfileImages = [
-    "https://i.pravatar.cc/150?img=29", "https://i.pravatar.cc/150?img=30",
-    "https://i.pravatar.cc/150?img=31", "https://i.pravatar.cc/150?img=32",
-    "https://i.pravatar.cc/150?img=33", "https://i.pravatar.cc/150?img=34",
-    "https://i.pravatar.cc/150?img=35", "https://i.pravatar.cc/150?img=36",
-    "https://i.pravatar.cc/150?img=37", "https://i.pravatar.cc/150?img=38",
-    "https://i.pravatar.cc/150?img=39", "https://i.pravatar.cc/150?img=40"
-  ];
-
-  const samplePrices = [
-    "12.0", "7.2", "2.7", "1.3", "4.4", "2.8", 
-    "3.8", "5.2", "0.7", "4.2", "1.2", "1.1"
-  ];
 
   useEffect(() => {
     const fetchSellers = async () => {
@@ -36,7 +17,7 @@ const TopSellers = () => {
       } catch (err) {
         console.error("Failed to load top sellers", err);
       } finally {
-        setTimeout(() => setLoading(false), 1000);
+        setTimeout(() => setLoading(false), 800);
       }
     };
 
@@ -44,44 +25,45 @@ const TopSellers = () => {
   }, []);
 
   const SkeletonSeller = ({ index }) => (
-    <div className="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 mb-4" key={`skeleton-${index}`}>
-      <div className="top-seller-item text-center">
-        <div 
-          className="skeleton-circle"
-          style={{
-            width: '60px',
-            height: '60px',
-            borderRadius: '50%',
-            margin: '0 auto 15px auto',
-            background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
-            backgroundSize: '200% 100%',
-            animation: 'shimmer 1.5s infinite'
-          }}
-        />
-        <div 
-          className="skeleton-text"
-          style={{
-            width: '70%',
-            height: '18px',
-            margin: '0 auto 8px auto',
-            borderRadius: '4px',
-            background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
-            backgroundSize: '200% 100%',
-            animation: 'shimmer 1.5s infinite'
-          }}
-        />
-        <div 
-          className="skeleton-text"
-          style={{
-            width: '50%',
-            height: '14px',
-            margin: '0 auto',
-            borderRadius: '4px',
-            background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
-            backgroundSize: '200% 100%',
-            animation: 'shimmer 1.5s infinite'
-          }}
-        />
+    <div className="col-lg-3 col-md-6 col-sm-6 col-12 mb-3" key={`skeleton-${index}`}>
+      <div className="seller-row-item">
+        <div className="seller-number">{index + 1}.</div>
+        <div className="seller-content">
+          <div 
+            className="seller-avatar-skeleton"
+            style={{
+              width: '55px',
+              height: '55px',
+              borderRadius: '50%',
+              background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
+              backgroundSize: '200% 100%',
+              animation: 'shimmer 1.5s infinite'
+            }}
+          />
+          <div className="seller-details">
+            <div 
+              style={{
+                width: '80%',
+                height: '16px',
+                background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
+                backgroundSize: '200% 100%',
+                animation: 'shimmer 1.5s infinite',
+                borderRadius: '4px',
+                marginBottom: '5px'
+              }}
+            />
+            <div 
+              style={{
+                width: '60%',
+                height: '14px',
+                background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
+                backgroundSize: '200% 100%',
+                animation: 'shimmer 1.5s infinite',
+                borderRadius: '4px'
+              }}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -105,59 +87,61 @@ const TopSellers = () => {
             ))
           ) : (
             sellers.slice(0, 12).map((seller, index) => {
+              // ✅ USE CENTRALIZED USER DATA for consistency
+              const userData = USERS_DATA[index];
+              
               const stateData = {
                 collection: {
                   ...seller,
-                  id: seller.id || index + 1,
-                  authorName: sampleSellerNames[index % sampleSellerNames.length],
-                  creatorName: sampleSellerNames[index % sampleSellerNames.length],
-                  authorImage: sellerProfileImages[index % sellerProfileImages.length],
-                  creatorImage: sellerProfileImages[index % sellerProfileImages.length],
-                  price: samplePrices[index % samplePrices.length],
+                  id: userData.id,
+                  authorName: userData.name,
+                  creatorName: userData.name,
+                  authorImage: userData.avatar,
+                  creatorImage: userData.avatar,
+                  price: userData.ethBalance,
                   views: Math.floor(Math.random() * 2000) + 500,
                   likes: Math.floor(Math.random() * 200) + 50,
-                  title: `${sampleSellerNames[index % sampleSellerNames.length]}'s Collection #${seller.id || index + 1}`,
-                  nftImage: seller.authorImage || sellerProfileImages[index % sellerProfileImages.length]
+                  title: `${userData.name}'s Collection #${userData.id}`,
+                  nftImage: seller.authorImage || userData.avatar,
+                  // ✅ Pass all user data for consistency
+                  userData: userData
                 },
               };
 
               return (
-                <div className="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 mb-4" key={seller.id || index}>
-                  <div className="top-seller-item text-center">
-                    <Link 
-                      to={`/author/${seller.id || index + 1}`} 
-                      state={stateData}
-                      className="text-decoration-none"
-                    >
-                      <div className="position-relative d-inline-block mb-3">
-                        <img 
-                          src={sellerProfileImages[index % sellerProfileImages.length]}
-                          alt={sampleSellerNames[index % sampleSellerNames.length]}
-                          className="rounded-circle"
-                          width={60}
-                          height={60}
-                          style={{ objectFit: 'cover' }}
-                        />
-                        <i 
-                          className="fa fa-check position-absolute"
-                          style={{
-                            bottom: "2px",
-                            right: "2px",
-                            backgroundColor: "white",
-                            borderRadius: "50%",
-                            fontSize: "10px",
-                            padding: "2px",
-                            color: "#007bff"
-                          }}
-                        />
+                <div className="col-lg-3 col-md-6 col-sm-6 col-12 mb-3" key={userData.id}>
+                  <div className="seller-row-item">
+                    <div className="seller-number">{index + 1}.</div>
+                    <div className="seller-content">
+                      <Link 
+                        to={`/author/${userData.id}`} 
+                        state={stateData}
+                        className="text-decoration-none seller-link"
+                      >
+                        <div className="seller-avatar">
+                          <img 
+                            src={userData.avatar} // ✅ Consistent avatar
+                            alt={userData.name}
+                            className="avatar-image"
+                          />
+                          <i className="fa fa-check verification-check" />
+                        </div>
+                      </Link>
+                      <div className="seller-details">
+                        <Link 
+                          to={`/author/${userData.id}`} 
+                          state={stateData}
+                          className="text-decoration-none seller-link"
+                        >
+                          <div className="seller-name">
+                            {userData.name} {/* ✅ Consistent name */}
+                          </div>
+                          <div className="seller-price">
+                            {userData.ethBalance} ETH {/* ✅ Consistent price */}
+                          </div>
+                        </Link>
                       </div>
-                      <h6 className="mb-1 text-dark">
-                        {sampleSellerNames[index % sampleSellerNames.length]}
-                      </h6>
-                      <span className="text-muted">
-                        {samplePrices[index % samplePrices.length]} ETH
-                      </span>
-                    </Link>
+                    </div>
                   </div>
                 </div>
               );
@@ -170,6 +154,12 @@ const TopSellers = () => {
 };
 
 export default TopSellers;
+
+
+
+
+
+
 
 
 

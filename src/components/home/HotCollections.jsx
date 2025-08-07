@@ -1,61 +1,18 @@
-// src/components/home/HotCollections.jsx
-
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import "../../css/styles/style.css";
+import { USERS_DATA } from "../../data/userData"; // ✅ Import centralized data
 
 const HotCollections = () => {
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Sample names and prices to match your desired output
-  const sampleOwners = [
-    "Gayle Hicks",
-    "Marcus Johnson", 
-    "Sarah Chen",
-    "David Wilson",
-    "Emma Rodriguez",
-    "Alex Turner"
-  ];
-
-  const sampleCreators = [
-    "Jimmy Wright",
-    "Lisa Park",
-    "Ryan Mitchell",
-    "Maya Patel",
-    "Chris Anderson",
-    "Jordan Lee"
-  ];
-
-  const samplePrices = ["0.29", "1.45", "0.87", "2.13", "0.64", "1.92"];
-
-  // Sample views and likes arrays
-  const sampleViews = [1250, 892, 2104, 756, 1876, 1432];
-  const sampleLikes = [89, 156, 234, 67, 198, 123];
-
   // Random NFT IDs like #942, #3847, etc.
   const sampleNFTIds = [3, 942, 1537, 8291, 456, 7623];
-
-  // Different profile images for owners and creators
-  const ownerProfileImages = [
-    "https://i.pravatar.cc/150?img=1",
-    "https://i.pravatar.cc/150?img=3",
-    "https://i.pravatar.cc/150?img=5",
-    "https://i.pravatar.cc/150?img=7",
-    "https://i.pravatar.cc/150?img=9",
-    "https://i.pravatar.cc/150?img=11"
-  ];
-
-  const creatorProfileImages = [
-    "https://i.pravatar.cc/150?img=2",
-    "https://i.pravatar.cc/150?img=4",
-    "https://i.pravatar.cc/150?img=6",
-    "https://i.pravatar.cc/150?img=8",
-    "https://i.pravatar.cc/150?img=10",
-    "https://i.pravatar.cc/150?img=12"
-  ];
+  const sampleViews = [1250, 892, 2104, 756, 1876, 1432];
+  const sampleLikes = [89, 156, 234, 67, 198, 123];
 
   const [sliderRef, slider] = useKeenSlider({
     loop: true,
@@ -108,20 +65,22 @@ const HotCollections = () => {
             <>
               <div ref={sliderRef} className="keen-slider">
                 {collections.slice(0, 6).map((collection, index) => {
+                  // ✅ USE SAME USER DATA as TopSellers for consistency
+                  const userData = USERS_DATA[index];
+                  
                   const stateData = {
                     collection: {
                       ...collection,
-                      // Override the id with random numbers
                       id: sampleNFTIds[index % sampleNFTIds.length],
-                      // Use sample names and prices that rotate through the arrays
-                      authorName: sampleOwners[index % sampleOwners.length],
-                      creatorName: sampleCreators[index % sampleCreators.length],
-                      authorImage: ownerProfileImages[index % ownerProfileImages.length],
-                      creatorImage: creatorProfileImages[index % creatorProfileImages.length],
-                      price: samplePrices[index % samplePrices.length],
-                      // Use sample views and likes
+                      authorName: userData.name, // ✅ Same name
+                      creatorName: userData.name,
+                      authorImage: userData.avatar, // ✅ Same avatar
+                      creatorImage: userData.avatar,
+                      price: userData.ethBalance, // ✅ Same price
                       views: sampleViews[index % sampleViews.length],
                       likes: sampleLikes[index % sampleLikes.length],
+                      // ✅ Pass user data for consistency
+                      userData: userData
                     },
                   };
 
@@ -138,11 +97,11 @@ const HotCollections = () => {
                           </Link>
                         </div>
                         <div className="nft_coll_pp position-relative">
-                          <Link to={`/item-details/${sampleNFTIds[index % sampleNFTIds.length]}`} state={stateData}>
+                          <Link to={`/author/${userData.id}`} state={stateData}> {/* ✅ Link to author page */}
                             <img
                               className="lazy pp-coll"
-                              src={ownerProfileImages[index % ownerProfileImages.length]}
-                              alt={sampleOwners[index % sampleOwners.length]}
+                              src={userData.avatar} // ✅ Consistent avatar
+                              alt={userData.name}
                             />
                           </Link>
                           <i 
@@ -170,7 +129,6 @@ const HotCollections = () => {
                 })}
               </div>
 
-              {/* Right Arrow */}
               <button
                 className="slider-arrow next-arrow"
                 onClick={() => slider.current?.next()}
@@ -195,6 +153,7 @@ const HotCollections = () => {
 };
 
 export default HotCollections;
+
 
 
 

@@ -1,60 +1,64 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import AuthorBanner from "../images/author_banner.jpg";
-import AuthorItems from "../components/author/AuthorItems";
+import AuthorItems from "../components/AuthorItems";
 import { Link } from "react-router-dom";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
-
-
+import { getUserById } from "../data/userData"; // ✅ Import helper function
 
 const Author = () => {
   const location = useLocation();
   const { id } = useParams();
   const navigate = useNavigate();
   const authorData = location.state?.collection;
-
-  // State for copy functionality
   const [copied, setCopied] = useState(false);
 
-  // Generate a realistic wallet address based on author ID
-  const generateWalletAddress = (authorId) => {
-    const baseWallet = "0x742d35Cc6A3b4C7C1A9B8E9F2D1C3B4A5F6E8D9C";
-    return baseWallet.slice(0, -4) + String(authorId).padStart(4, '0');
-  };
-
-  // Generate follower count based on author index
-  const generateFollowerCount = (index) => {
-    const baseCounts = [573, 1240, 892, 2104, 756, 1876, 1432, 945, 683, 1567, 834, 1299];
-    return baseCounts[index % baseCounts.length];
-  };
+  // ✅ Get consistent user data
+  const userData = getUserById(id) || authorData?.userData;
 
   useEffect(() => {
-    if (!authorData) {
-      // If no author data, redirect to home
+    if (!authorData && !userData) {
       navigate("/");
     }
     window.scrollTo(0, 0);
-  }, [authorData, navigate]);
+  }, [authorData, userData, navigate]);
 
-  // Copy wallet address functionality
   const copyWalletAddress = () => {
-    if (authorData) {
-      const wallet = generateWalletAddress(id);
-      navigator.clipboard.writeText(wallet).then(() => {
+    if (userData?.walletAddress) {
+      navigator.clipboard.writeText(userData.walletAddress).then(() => {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       });
     }
   };
 
-  if (!authorData) {
-    return null; // Will redirect in useEffect
+  if (!authorData && !userData) {
+    return (
+      <>
+        <Nav />
+        <div className="container my-5">
+          <div className="text-center">
+            <h2>Author Not Found</h2>
+            <p>No author data available.</p>
+            <Link to="/" className="btn btn-primary">Go Home</Link>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
   }
 
-  const followerCount = generateFollowerCount(parseInt(id) - 1);
-  const walletAddress = generateWalletAddress(id);
-  const username = `@${authorData.authorName.toLowerCase().replace(/\s+/g, '')}`;
+  // ✅ Use consistent user data throughout
+  const displayUser = userData || {
+    name: authorData?.authorName,
+    avatar: authorData?.authorImage,
+    username: authorData?.authorName?.toLowerCase().replace(/\s+/g, ''),
+    followerCount: 1000,
+    walletAddress: authorData?.walletAddress || "0x742d35Cc6A3b4C7C1A9B8E9F2D1C" + id?.padStart(4, '0')
+  };
+
+  const username = `@${displayUser.username || displayUser.name?.toLowerCase().replace(/\s+/g, '')}`;
 
   return (
     <div id="wrapper">
@@ -77,15 +81,14 @@ const Author = () => {
                 <div className="d_profile de-flex">
                   <div className="de-flex-col">
                     <div className="profile_avatar">
-                      <img src={authorData.authorImage} alt={authorData.authorName} />
-
+                      <img src={displayUser.avatar} alt={displayUser.name} />
                       <i className="fa fa-check"></i>
                       <div className="profile_name">
                         <h4>
-                          {authorData.authorName}
+                          {displayUser.name}
                           <span className="profile_username">{username}</span>
                           <span id="wallet" className="profile_wallet">
-                            {walletAddress}
+                            {displayUser.walletAddress}
                           </span>
                           <button 
                             id="btn_copy" 
@@ -104,7 +107,9 @@ const Author = () => {
                   </div>
                   <div className="profile_follow de-flex">
                     <div className="de-flex-col">
-                      <div className="profile_follower">{followerCount.toLocaleString()} followers</div>
+                      <div className="profile_follower">
+                        {displayUser.followerCount?.toLocaleString() || '1,000'} followers
+                      </div>
                       <Link to="#" className="btn-main">
                         Follow
                       </Link>
@@ -115,7 +120,15 @@ const Author = () => {
 
               <div className="col-md-12">
                 <div className="de_tab tab_simple">
-                  <AuthorItems authorData={authorData} />
+                  {/* ✅ Pass consistent author data */}
+                  <AuthorItems 
+                    authorData={{
+                      ...authorData,
+                      authorName: displayUser.name,
+                      authorImage: displayUser.avatar,
+                      id: id
+                    }} 
+                  />
                 </div>
               </div>
             </div>
@@ -128,4 +141,3 @@ const Author = () => {
 };
 
 export default Author;
-
