@@ -1,80 +1,105 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import AuthorImage from "../../images/author_thumbnail.jpg";
-import nftImage from "../../images/nftImage.jpg";
+import React, { useEffect, useState } from "react";
+import SubHeader from "../../images/subheader.jpg"; 
+import ExploreItems from "./ExploreItems"; ixed path
 
-const ExploreItems = () => {
+const Explore = () => {
+  const [exploreData, setExploreData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [displayedItems, setDisplayedItems] = useState(8); 
+  const [allData, setAllData] = useState([]); 
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    fetchExploreData();
+  }, []);
+
+  const fetchExploreData = async () => {
+    try {
+      const response = await fetch("https://us-central1-nft-cloud-functions.cloudfunctions.net/explore");
+      const data = await response.json();
+      
+      // Store first 16 items as maximum
+      const maxData = data.slice(0, 16);
+      setAllData(maxData);
+      
+      // Initially show first 8 items
+      setExploreData(maxData.slice(0, 8));
+    } catch (error) {
+      console.error("Failed to fetch explore data:", error);
+    } finally {
+      setTimeout(() => setLoading(false), 800);
+    }
+  };
+
+  const loadMoreItems = () => {
+    if (displayedItems >= 16 || displayedItems >= allData.length) {
+      return; // Don't load more if we've reached the limit
+    }
+
+    setLoadingMore(true);
+    
+    setTimeout(() => {
+      const newDisplayCount = Math.min(displayedItems + 4, 16, allData.length);
+      setDisplayedItems(newDisplayCount);
+      setExploreData(allData.slice(0, newDisplayCount));
+      setLoadingMore(false);
+    }, 500);
+  };
+
+  const canLoadMore = displayedItems < 16 && displayedItems < allData.length;
+
   return (
-    <>
-      <div>
-        <select id="filter-items" defaultValue="">
-          <option value="">Default</option>
-          <option value="price_low_to_high">Price, Low to High</option>
-          <option value="price_high_to_low">Price, High to Low</option>
-          <option value="likes_high_to_low">Most liked</option>
-        </select>
-      </div>
-      {new Array(8).fill(0).map((_, index) => (
-        <div
-          key={index}
-          className="d-item col-lg-3 col-md-6 col-sm-6 col-xs-12"
-          style={{ display: "block", backgroundSize: "cover" }}
+    <div id="wrapper">
+      <div className="no-bottom no-top" id="content">
+        <div id="top"></div>
+        
+        <section
+          id="subheader"
+          className="text-light"
+          style={{ background: `url("${SubHeader}") top` }}
         >
-          <div className="nft__item">
-            <div className="author_list_pp">
-              <Link
-                to="/author"
-                data-bs-toggle="tooltip"
-                data-bs-placement="top"
-              >
-                <img className="lazy" src={AuthorImage} alt="" />
-                <i className="fa fa-check"></i>
-              </Link>
-            </div>
-            <div className="de_countdown">5h 30m 32s</div>
-
-            <div className="nft__item_wrap">
-              <div className="nft__item_extra">
-                <div className="nft__item_buttons">
-                  <button>Buy Now</button>
-                  <div className="nft__item_share">
-                    <h4>Share</h4>
-                    <a href="" target="_blank" rel="noreferrer">
-                      <i className="fa fa-facebook fa-lg"></i>
-                    </a>
-                    <a href="" target="_blank" rel="noreferrer">
-                      <i className="fa fa-twitter fa-lg"></i>
-                    </a>
-                    <a href="">
-                      <i className="fa fa-envelope fa-lg"></i>
-                    </a>
-                  </div>
+          <div className="center-y relative text-center">
+            <div className="container">
+              <div className="row">
+                <div className="col-md-12 text-center">
+                  <h1>Explore</h1>
                 </div>
-              </div>
-              <Link to="/item-details">
-                <img src={nftImage} className="lazy nft__item_preview" alt="" />
-              </Link>
-            </div>
-            <div className="nft__item_info">
-              <Link to="/item-details">
-                <h4>Pinky Ocean</h4>
-              </Link>
-              <div className="nft__item_price">1.74 ETH</div>
-              <div className="nft__item_like">
-                <i className="fa fa-heart"></i>
-                <span>69</span>
+                <div className="clearfix"></div>
               </div>
             </div>
           </div>
-        </div>
-      ))}
-      <div className="col-md-12 text-center">
-        <Link to="" id="loadmore" className="btn-main lead">
-          Load more
-        </Link>
+        </section>
+
+        <section aria-label="section">
+          <div className="container">
+            <div className="row">
+              <ExploreItems exploreData={exploreData} loading={loading} />
+            </div>
+            
+            {/* Load More Button */}
+            {canLoadMore && (
+              <div className="col-lg-12">
+                <div className="spacer-single"></div>
+                <span 
+                  onClick={loadMoreItems}
+                  className="btn-main lead"
+                  style={{ 
+                    cursor: loadingMore ? 'not-allowed' : 'pointer',
+                    opacity: loadingMore ? 0.6 : 1
+                  }}
+                >
+                  {loadingMore ? 'Loading...' : 'Load more'}
+                </span>
+              </div>
+            )}
+          </div>
+        </section>
       </div>
-    </>
+    </div>
   );
 };
 
-export default ExploreItems;
+export default Explore;
+
+
