@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import SubHeader from "../../images/subheader.jpg"; 
-import ExploreItems from "./ExploreItems"; ixed path
+import ExploreItems from "./ExploreItems"; 
+
 
 const Explore = () => {
   const [exploreData, setExploreData] = useState([]);
