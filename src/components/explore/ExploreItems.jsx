@@ -43,7 +43,7 @@ const ExploreItems = () => {
 
   const canLoadMore = displayedItems < 16 && displayedItems < allData.length;
 
-  // Countdown Timer Component
+  // Countdown Timer Component - WHITE BACKGROUND
   const CountdownTimer = ({ expiryDate }) => {
     const [timeLeft, setTimeLeft] = useState('');
 
@@ -68,13 +68,14 @@ const ExploreItems = () => {
 
     return (
       <div style={{
-        background: 'rgba(0, 0, 0, 0.8)',
-        color: 'white',
+        background: 'rgba(255, 255, 255, 0.95)', // WHITE BACKGROUND
+        color: '#333', // DARK TEXT
         padding: '6px 12px',
         borderRadius: '12px',
         fontSize: '11px',
         fontWeight: '600',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+        boxShadow: '0 2px 8px rgba(0,0,0,0.15)', // ENHANCED SHADOW
+        backdropFilter: 'blur(10px)' // MODERN BLUR EFFECT
       }}>
         {timeLeft}
       </div>
@@ -263,6 +264,7 @@ const ExploreItems = () => {
 };
 
 export default ExploreItems;
+
 
 
 
