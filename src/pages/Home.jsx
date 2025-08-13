@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import Nav from "../components/Nav";
+import Header from "../components/Header"; // Change from Nav to Header
 import Footer from "../components/Footer";
 import BrowseByCategory from "../components/home/BrowseByCategory";
 import HotCollections from "../components/home/HotCollections";
@@ -15,7 +15,7 @@ const Home = () => {
 
   return (
     <div id="wrapper">
-      <Nav />
+      <Header /> {/* Changed from <Nav /> to <Header /> */}
       <div className="no-bottom no-top" id="content">
         <div id="top"></div>
         <Landing />
@@ -31,4 +31,5 @@ const Home = () => {
 };
 
 export default Home;
+
 
