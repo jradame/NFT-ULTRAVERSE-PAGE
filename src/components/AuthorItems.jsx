@@ -1,106 +1,88 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getUserById, getUserArtworks } from "../data/userData";
 
 const AuthorItems = ({ authorData }) => {
   const [items, setItems] = useState([]);
+  const [authorInfo, setAuthorInfo] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Get user data and their specific artworks
-  const userData = getUserById(authorData?.id);
-  const userArtworks = getUserArtworks(authorData?.id);
-  
-  const displayAvatar = userData?.avatar || authorData?.authorImage;
-  const displayName = userData?.name || authorData?.authorName;
-
   useEffect(() => {
-    if (authorData && userArtworks) {
-      setLoading(true);
-      setTimeout(() => {
-        // Use actual user artworks instead of generating random ones
-        const processedArtworks = userArtworks.map((artwork, index) => ({
-          ...artwork,
-          id: `${authorData.id}-artwork-${index + 1}`,
-          nftId: `${authorData.id}${String(index + 1).padStart(3, '0')}`,
-          authorName: displayName,
-          authorImage: displayAvatar,
-          creatorName: displayName,
-          creatorImage: displayAvatar,
-          createdDate: `202${3 - Math.floor(index / 4)}-${String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`,
-        }));
-        
-        setItems(processedArtworks);
+    let isMounted = true;
+
+    const fetchAuthorData = async () => {
+      if (!authorData?.id) {
+        console.warn("❌ Missing author ID");
         setLoading(false);
-      }, 800);
-    }
-  }, [authorData, userArtworks, displayName, displayAvatar]);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const res = await fetch(
+          `https://us-central1-nft-cloud-functions.cloudfunctions.net/authors?author=${encodeURIComponent(authorData.id)}`
+        );
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch author data");
+        }
+
+        const data = await res.json();
+        console.log("✅ Fetched author data:", data);
+
+        if (isMounted) {
+          const artworks = data.artworks || []; // Adjust if structure differs
+          setAuthorInfo({
+            name: data.name || "Unknown",
+            avatar: data.avatar || "",
+          });
+          setItems(artworks);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error("❌ Error fetching author items:", error);
+        if (isMounted) {
+          setItems([]);
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchAuthorData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [authorData?.id]);
 
   const SkeletonItem = () => (
     <div className="col-lg-3 col-md-6 col-sm-6 col-xs-12 mb-4">
       <div className="nft__item">
         <div className="author_list_pp">
-          <div 
-            className="skeleton-box rounded-circle"
-            style={{ 
-              width: '50px', 
-              height: '50px',
-              background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
-              backgroundSize: '200% 100%',
-              animation: 'shimmer 1.5s infinite'
-            }}
-          />
+          <div className="skeleton-box rounded-circle" style={skeletonStyle(50, 50)} />
         </div>
         <div className="nft__item_wrap">
-          <div 
-            className="skeleton-box"
-            style={{ 
-              width: '100%', 
-              height: '250px',
-              borderRadius: '10px',
-              background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
-              backgroundSize: '200% 100%',
-              animation: 'shimmer 1.5s infinite'
-            }}
-          />
+          <div className="skeleton-box" style={skeletonStyle("100%", 250)} />
         </div>
         <div className="nft__item_info">
-          <div 
-            className="skeleton-text mb-2"
-            style={{ 
-              width: '70%', 
-              height: '20px',
-              background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
-              backgroundSize: '200% 100%',
-              animation: 'shimmer 1.5s infinite',
-              borderRadius: '4px'
-            }}
-          />
-          <div 
-            className="skeleton-text mb-2"
-            style={{ 
-              width: '50%', 
-              height: '18px',
-              background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
-              backgroundSize: '200% 100%',
-              animation: 'shimmer 1.5s infinite',
-              borderRadius: '4px'
-            }}
-          />
-          <div 
-            className="skeleton-text"
-            style={{ 
-              width: '40%', 
-              height: '16px',
-              background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
-              backgroundSize: '200% 100%',
-              animation: 'shimmer 1.5s infinite',
-              borderRadius: '4px'
-            }}
-          />
+          <div className="skeleton-text mb-2" style={skeletonStyle("70%", 20)} />
+          <div className="skeleton-text mb-2" style={skeletonStyle("50%", 18)} />
+          <div className="skeleton-text" style={skeletonStyle("40%", 16)} />
         </div>
       </div>
     </div>
   );
+
+  const skeletonStyle = (width, height) => ({
+    width,
+    height,
+    background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
+    backgroundSize: '200% 100%',
+    animation: 'shimmer 1.5s infinite',
+    borderRadius: '4px',
+  });
+
+  const displayName = authorInfo?.name || "Unknown";
+  const displayAvatar = authorInfo?.avatar || "/default-avatar.jpg";
 
   return (
     <div className="author-items-section">
@@ -110,39 +92,30 @@ const AuthorItems = ({ authorData }) => {
           <p className="text-muted">Explore the complete collection by {displayName}</p>
         </div>
       </div>
-      
+
       <div className="row">
         {loading ? (
-          [...Array(6)].map((_, index) => (
-            <SkeletonItem key={index} />
-          ))
-        ) : (
-          items.map((item) => {
-            const stateData = {
-              collection: {
-                ...item,
-                authorName: displayName,
-                creatorName: displayName,
-                authorImage: displayAvatar,
-                creatorImage: displayAvatar,
-              },
-            };
+          [...Array(6)].map((_, index) => <SkeletonItem key={index} />)
+        ) : items.length ? (
+          items.map((item, index) => {
+            const stateData = { collection: item };
+            const nftId = `${authorData.id}${String(index + 1).padStart(3, '0')}`;
 
             return (
-              <div className="col-lg-3 col-md-6 col-sm-6 col-xs-12 mb-4" key={item.id}>
+              <div className="col-lg-3 col-md-6 col-sm-6 col-xs-12 mb-4" key={nftId}>
                 <div className="nft__item">
                   <div className="author_list_pp">
-                    <Link to={`/item-details/${item.nftId}`} state={stateData}>
+                    <Link to={`/item-details/${nftId}`} state={stateData}>
                       <div className="position-relative">
-                        <img 
-                          className="lazy" 
+                        <img
+                          className="lazy"
                           src={displayAvatar}
                           alt={displayName}
                           width={50}
                           height={50}
                           style={{ borderRadius: '50%', objectFit: 'cover' }}
                         />
-                        <i 
+                        <i
                           className="fa fa-check position-absolute"
                           style={{
                             bottom: "0px",
@@ -160,25 +133,7 @@ const AuthorItems = ({ authorData }) => {
                   </div>
 
                   <div className="nft__item_wrap">
-                    <div className="nft__item_extra">
-                      <div className="nft__item_buttons">
-                        <button>Buy Now</button>
-                        <div className="nft__item_share">
-                          <h4>Share</h4>
-                          <a href="#" target="_blank" rel="noreferrer">
-                            <i className="fa fa-facebook fa-lg"></i>
-                          </a>
-                          <a href="#" target="_blank" rel="noreferrer">
-                            <i className="fa fa-twitter fa-lg"></i>
-                          </a>
-                          <a href="#">
-                            <i className="fa fa-envelope fa-lg"></i>
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-
-                    <Link to={`/item-details/${item.nftId}`} state={stateData}>
+                    <Link to={`/item-details/${nftId}`} state={stateData}>
                       <img
                         src={item.nftImage}
                         className="lazy nft__item_preview"
@@ -192,7 +147,6 @@ const AuthorItems = ({ authorData }) => {
                       />
                     </Link>
 
-                    {/* Artwork details overlay */}
                     <div className="artwork-details" style={{
                       position: 'absolute',
                       bottom: '10px',
@@ -210,16 +164,16 @@ const AuthorItems = ({ authorData }) => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="nft__item_info">
-                    <Link to={`/item-details/${item.nftId}`} state={stateData}>
+                    <Link to={`/item-details/${nftId}`} state={stateData}>
                       <h4>{item.title}</h4>
                     </Link>
                     <div className="nft__item_price">
                       {parseFloat(item.price).toFixed(2)} ETH
                     </div>
-                    <div className="nft__item_stats" style={{ 
-                      display: 'flex', 
+                    <div className="nft__item_stats" style={{
+                      display: 'flex',
                       justifyContent: 'space-between',
                       fontSize: '12px',
                       color: '#666',
@@ -242,17 +196,16 @@ const AuthorItems = ({ authorData }) => {
               </div>
             );
           })
+        ) : (
+          <div className="col-12 text-center py-5">
+            <h4>No artworks found</h4>
+            <p className="text-muted">This artist hasn't created any NFTs yet.</p>
+          </div>
         )}
       </div>
-      
-      {!loading && items.length === 0 && (
-        <div className="col-12 text-center py-5">
-          <h4>No artworks found</h4>
-          <p className="text-muted">This artist hasn't created any NFTs yet.</p>
-        </div>
-      )}
     </div>
   );
 };
 
 export default AuthorItems;
+

@@ -8,7 +8,7 @@ import { getUserById } from "../data/userData";
 
 const API_URL = "https://us-central1-nft-cloud-functions.cloudfunctions.net/authors";
 
-// ---------- In-file helpers (no separate normalizer file) ----------
+// ---------- Helpers ----------
 function toSlug(s) {
   return (s || "").toString().trim().toLowerCase().replace(/\s+/g, "");
 }
@@ -16,8 +16,6 @@ function toNumber(v) {
   const n = Number(v);
   return Number.isFinite(n) ? n : 0;
 }
-
-// Normalize an "author-like" object into a consistent shape this page uses.
 function normalizeAuthor(raw, fallbackId) {
   if (!raw && !fallbackId) return null;
 
@@ -44,10 +42,7 @@ function normalizeAuthor(raw, fallbackId) {
     raw?.img ??
     "";
 
-  const username =
-    raw?.username ||
-    (name ? toSlug(name) : "");
-
+  const username = raw?.username || (name ? toSlug(name) : "");
   const walletAddress =
     raw?.walletAddress ??
     raw?.wallet_address ??
@@ -67,26 +62,20 @@ function normalizeAuthor(raw, fallbackId) {
 
   return { id, name, username, avatar, walletAddress, followerCount, bio };
 }
-
-// Try to get an author object from various possible shapes in location.state
 function extractAuthorFromState(state, fallbackId) {
   if (!state) return null;
 
-  // Explicit author passed
   if (state.author && typeof state.author === "object") {
     return normalizeAuthor(state.author, fallbackId);
   }
 
-  // If a collection or item was passed, try to synthesize from nested/flat fields
   const source = state.collection || state.item || null;
   if (source) {
-    // Prefer nested author object if present
     if (source.author && typeof source.author === "object") {
       const nested = normalizeAuthor(source.author, fallbackId);
       if (nested?.id) return nested;
     }
 
-    // Otherwise, try to build from common top-level keys used in collections/items
     return normalizeAuthor(
       {
         id: source.authorId ?? source.author_id ?? source.creatorId ?? source.creator_id,
@@ -111,41 +100,25 @@ function extractAuthorFromState(state, fallbackId) {
     );
   }
 
-  // Legacy: some code might pass { collection: <author-like> }
-  if (
-    state.collection &&
-    typeof state.collection === "object" &&
-    !state.collection.author &&
-    (state.collection.authorName || state.collection.authorImage)
-  ) {
-    return normalizeAuthor(state.collection, fallbackId);
-  }
-
   return null;
 }
-// -------------------------------------------------------------------
+// -----------------------------
 
 const Author = () => {
   const location = useLocation();
-  const { id } = useParams(); // route id for author
+  const { id } = useParams();
 
   const [copied, setCopied] = useState(false);
-
-  // Fetching state
   const [authorFromApi, setAuthorFromApi] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Follow state (client-side, persisted per author)
   const [isFollowing, setIsFollowing] = useState(false);
   const [followerCount, setFollowerCount] = useState(0);
 
-  // Author coming from Explorer/HotCollections/etc
   const authorFromState = useMemo(() => {
     return extractAuthorFromState(location.state, id);
   }, [location.state, id]);
 
-  // Local mapping (if any)
   const localUser = useMemo(() => {
     const u = getUserById?.(id);
     return u ? normalizeAuthor(u, id) : null;
@@ -156,7 +129,6 @@ const Author = () => {
     return String(authorFromState.id) === String(id);
   }, [authorFromState, id]);
 
-  // Fetch the author if we don't already have matching state/local data
   useEffect(() => {
     let isMounted = true;
 
@@ -166,14 +138,22 @@ const Author = () => {
         setError(null);
 
         const res = await fetch(`${API_URL}?author=${encodeURIComponent(id)}`);
-        if (!res.ok) throw new Error(`Failed to fetch author (${res.status})`);
         const data = await res.json();
+
+        console.log("✅ Fetched raw author data:", data);
+
         if (!isMounted) return;
 
         const normalized = normalizeAuthor(data, id);
-        setAuthorFromApi(normalized);
+        console.log("✅ Normalized author from API:", normalized);
+
+        if (normalized?.id) {
+          setAuthorFromApi(normalized);
+        } else {
+          throw new Error("Invalid author data from API.");
+        }
       } catch (e) {
-        console.error(e);
+        console.error("❌ Error fetching author:", e);
         if (isMounted) setError("Unable to fetch author data.");
       } finally {
         if (isMounted) setLoading(false);
@@ -183,7 +163,12 @@ const Author = () => {
     if (!authorFromStateMatchesRoute && !localUser) {
       fetchAuthor();
     } else {
-      setLoading(false);
+      const fallback = authorFromState || localUser;
+      if (!fallback?.id) {
+        fetchAuthor(); // fallback in case data is invalid
+      } else {
+        setLoading(false);
+      }
     }
 
     window.scrollTo(0, 0);
@@ -192,7 +177,6 @@ const Author = () => {
     };
   }, [id, authorFromStateMatchesRoute, localUser]);
 
-  // Choose the final author to display
   const displayUser = useMemo(() => {
     if (authorFromStateMatchesRoute && authorFromState) return authorFromState;
     if (localUser) return localUser;
@@ -201,18 +185,25 @@ const Author = () => {
     return null;
   }, [authorFromApi, authorFromState, authorFromStateMatchesRoute, localUser, id]);
 
-  // Initialize follow state and followerCount when author resolves
+  // 🔍 LOG EVERYTHING
+  useEffect(() => {
+    console.log("🧩 Route ID:", id);
+    console.log("📦 Author from API:", authorFromApi);
+    console.log("🌐 Author from location.state:", authorFromState);
+    console.log("💾 Local user from getUserById:", localUser);
+    console.log("🧑 Final displayUser:", displayUser);
+  }, [id, authorFromApi, authorFromState, localUser, displayUser]);
+
   useEffect(() => {
     if (!displayUser?.id) return;
+
     const key = `follow:${displayUser.id}`;
     let stored = false;
     try {
       stored = localStorage.getItem(key) === "1";
-    } catch (_) {
-      // ignore storage errors
-    }
-    setIsFollowing(stored);
+    } catch (_) {}
 
+    setIsFollowing(stored);
     const base = toNumber(displayUser?.followerCount);
     setFollowerCount(base + (stored ? 1 : 0));
   }, [displayUser?.id, displayUser?.followerCount]);
@@ -234,9 +225,7 @@ const Author = () => {
       setFollowerCount((curr) => Math.max(0, curr + (next ? 1 : -1)));
       try {
         localStorage.setItem(`follow:${displayUser.id}`, next ? "1" : "0");
-      } catch (_) {
-        // ignore storage errors
-      }
+      } catch (_) {}
       return next;
     });
   };
@@ -254,6 +243,7 @@ const Author = () => {
   }
 
   if (error || !displayUser?.id) {
+    console.warn("⚠️ Display user not valid:", displayUser);
     return (
       <>
         <Nav />
@@ -304,12 +294,12 @@ const Author = () => {
                             title="Copy wallet address"
                             onClick={copyWalletAddress}
                             style={{
-                              backgroundColor: copied ? '#28a745' : '',
-                              color: copied ? 'white' : ''
+                              backgroundColor: copied ? "#28a745" : "",
+                              color: copied ? "white" : ""
                             }}
                             disabled={!displayUser.walletAddress}
                           >
-                            {copied ? 'Copied!' : 'Copy'}
+                            {copied ? "Copied!" : "Copy"}
                           </button>
                         </h4>
                       </div>
@@ -334,23 +324,31 @@ const Author = () => {
                 </div>
               </div>
 
-              {/* Items tab, pass consistent author data */}
               <div className="col-md-12">
                 <div className="de_tab tab_simple">
+                  {/* 🔍 Log what gets passed into AuthorItems */}
+                  {console.log("📦 Passing to AuthorItems:", {
+                    id: displayUser.id,
+                    authorName: displayUser.name,
+                    authorImage: displayUser.avatar,
+                    walletAddress: displayUser.walletAddress,
+                    followerCount: followerCount,
+                    username: displayUser.username,
+                    bio: displayUser.bio
+                  })}
                   <AuthorItems
                     authorData={{
                       id: displayUser.id,
                       authorName: displayUser.name,
                       authorImage: displayUser.avatar,
                       walletAddress: displayUser.walletAddress,
-                      followerCount: followerCount, // live count
+                      followerCount: followerCount,
                       username: displayUser.username,
                       bio: displayUser.bio
                     }}
                   />
                 </div>
               </div>
-
             </div>
           </div>
         </section>
@@ -361,5 +359,3 @@ const Author = () => {
 };
 
 export default Author;
-
-
