@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useKeenSlider } from "keen-slider/react";
+import "keen-slider/keen-slider.min.css";
 import { Link } from "react-router-dom";
 import AuthorImage from "../../images/author_thumbnail.jpg";
 import nftImage from "../../images/nftImage.jpg";
@@ -10,32 +11,22 @@ const HotCollections = () => {
   const [loaded, setLoaded] = useState(false);
 
   const [sliderRef, instanceRef] = useKeenSlider({
-    initial: 0,
+    loop: true,
     slides: {
       perView: 4,
-      spacing: 20,
+      spacing: 30,
     },
     breakpoints: {
-      "(max-width: 480px)": {
-        slides: {
-          perView: 1,
-          spacing: 10,
-        },
+      "(max-width: 1024px)": {
+        slides: { perView: 3, spacing: 25 },
       },
       "(max-width: 768px)": {
-        slides: {
-          perView: 2,
-          spacing: 15,
-        },
+        slides: { perView: 2, spacing: 20 },
       },
-      "(max-width: 1024px)": {
-        slides: {
-          perView: 3,
-          spacing: 15,
-        },
+      "(max-width: 480px)": {
+        slides: { perView: 1, spacing: 15 },
       },
     },
-    loop: true,
     slideChanged(slider) {
       setCurrentSlide(slider.track.details.rel);
     },
@@ -54,37 +45,138 @@ const HotCollections = () => {
         setCollections(data);
       } catch (error) {
         console.error("Error fetching collections:", error);
-        // Fallback to static data if API fails
         setCollections([
           {
             nftImage: nftImage,
             authorImage: AuthorImage,
-            title: "Pinky Ocean",
-            tag: "ERC-192"
+            title: "Abstraction",
+            tag: "ERC-192",
           },
           {
             nftImage: nftImage,
             authorImage: AuthorImage,
-            title: "Blue Dreams",
-            tag: "ERC-721"
+            title: "Patternlicious",
+            tag: "ERC-661",
           },
           {
             nftImage: nftImage,
             authorImage: AuthorImage,
-            title: "Cyber Punk",
-            tag: "ERC-1155"
+            title: "Sketchify",
+            tag: "ERC-164",
           },
           {
             nftImage: nftImage,
             authorImage: AuthorImage,
-            title: "Digital Art",
-            tag: "ERC-192"
-          }
+            title: "Cartoonism",
+            tag: "ERC-112",
+          },
+          {
+            nftImage: nftImage,
+            authorImage: AuthorImage,
+            title: "Virtualand",
+            tag: "ERC-721",
+          },
+          {
+            nftImage: nftImage,
+            authorImage: AuthorImage,
+            title: "Papercut",
+            tag: "ERC-1155",
+          },
         ]);
       }
     }
     fetchCollections();
   }, []);
+
+  const cardStyle = {
+    border: "none",
+    padding: 0,
+    maxWidth: "280px",
+    margin: "0 auto",
+    borderRadius: "16px",
+    boxShadow: "0 8px 25px rgba(52, 111, 255, 0.12)",
+    transition: "all 0.3s ease",
+    backgroundColor: "#fff",
+    overflow: "visible",
+  };
+
+  const imageStyle = {
+    borderRadius: "16px 16px 0 0",
+    height: "180px",
+    width: "100%",
+    objectFit: "cover",
+  };
+
+  const profileStyle = {
+    position: "absolute",
+    bottom: "-45px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    zIndex: 10,
+  };
+
+  const profileImageStyle = {
+    width: "65px",
+    height: "65px",
+    borderRadius: "50%",
+    border: "4px solid #fff",
+    backgroundColor: "#fff",
+    boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
+    display: "block",
+  };
+
+  const checkIconStyle = {
+    position: "absolute",
+    bottom: "2px",
+    right: "2px",
+    background: "#007bff",
+    color: "white",
+    borderRadius: "50%",
+    width: "20px",
+    height: "20px",
+    fontSize: "10px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    border: "2px solid #fff",
+  };
+
+  const infoStyle = {
+    padding: "55px 20px 25px 20px",
+    textAlign: "center",
+  };
+
+  const titleStyle = {
+    fontWeight: "700",
+    fontSize: "1.2rem",
+    marginBottom: "8px",
+    color: "#212529",
+  };
+
+  const tagStyle = {
+    fontSize: "0.95rem",
+    color: "#6c757d",
+    fontWeight: "500",
+  };
+
+  const arrowStyle = {
+    width: "45px",
+    height: "45px",
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    border: "1px solid rgba(0, 0, 0, 0.1)",
+    borderRadius: "50%",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#666",
+    position: "absolute",
+    top: "50%",
+    transform: "translateY(-50%)",
+    zIndex: 10,
+    transition: "all 0.3s ease",
+    boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+  };
 
   return (
     <section id="section-collections" className="no-bottom">
@@ -98,35 +190,37 @@ const HotCollections = () => {
           </div>
         </div>
 
-        <div className="navigation-wrapper">
+        <div style={{ position: "relative", margin: "40px 0" }}>
           <div ref={sliderRef} className="keen-slider">
             {collections.map((collection, index) => (
-              <div className="keen-slider__slide" key={index}>
-                <div className="nft_coll">
-                  <div className="nft_wrap">
+              <div key={index} className="keen-slider__slide">
+                <div style={cardStyle}>
+                  <div style={{ position: "relative" }}>
                     <Link to="/item-details">
-                      <img 
-                        src={collection.nftImage} 
-                        className="lazy img-fluid" 
-                        alt={collection.title || `NFT ${index + 1}`} 
+                      <img
+                        src={collection.nftImage}
+                        alt={collection.title || `NFT ${index + 1}`}
+                        className="lazy img-fluid"
+                        style={imageStyle}
                       />
                     </Link>
+                    <div style={profileStyle}>
+                      <Link to="/author">
+                        <img
+                          src={collection.authorImage}
+                          alt="Author"
+                          className="lazy pp-coll"
+                          style={profileImageStyle}
+                        />
+                      </Link>
+                      <i className="fa fa-check" style={checkIconStyle}></i>
+                    </div>
                   </div>
-                  <div className="nft_coll_pp">
-                    <Link to="/author">
-                      <img 
-                        className="lazy pp-coll" 
-                        src={collection.authorImage} 
-                        alt="Author" 
-                      />
-                    </Link>
-                    <i className="fa fa-check"></i>
-                  </div>
-                  <div className="nft_coll_info">
+                  <div style={infoStyle}>
                     <Link to="/explore">
-                      <h4>{collection.title}</h4>
+                      <h4 style={titleStyle}>{collection.title}</h4>
                     </Link>
-                    <span>{collection.tag}</span>
+                    <span style={tagStyle}>{collection.tag}</span>
                   </div>
                 </div>
               </div>
@@ -135,19 +229,47 @@ const HotCollections = () => {
 
           {loaded && instanceRef.current && collections.length > 0 && (
             <>
-              <Arrow
-                left
+              <div
+                style={{
+                  ...arrowStyle,
+                  left: "-30px",
+                }}
                 onClick={(e) => {
                   e.stopPropagation();
                   instanceRef.current?.prev();
                 }}
-              />
-              <Arrow
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = "rgba(0, 0, 0, 0.1)";
+                  e.target.style.color = "#333";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = "rgba(255, 255, 255, 0.95)";
+                  e.target.style.color = "#666";
+                }}
+              >
+                ‹
+              </div>
+
+              <div
+                style={{
+                  ...arrowStyle,
+                  right: "-30px",
+                }}
                 onClick={(e) => {
                   e.stopPropagation();
                   instanceRef.current?.next();
                 }}
-              />
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = "rgba(0, 0, 0, 0.1)";
+                  e.target.style.color = "#333";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = "rgba(255, 255, 255, 0.95)";
+                  e.target.style.color = "#666";
+                }}
+              >
+                ›
+              </div>
             </>
           )}
         </div>
@@ -156,26 +278,10 @@ const HotCollections = () => {
   );
 };
 
-function Arrow({ disabled, left, onClick }) {
-  const disabledClass = disabled ? " arrow--disabled" : "";
-  return (
-    <svg
-      onClick={onClick}
-      className={`arrow ${left ? "arrow--left" : "arrow--right"}${disabledClass}`}
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-    >
-      {left && (
-        <path d="m13.293 6.293-6 6a1 1 0 0 0 0 1.414l6 6a1 1 0 1 0 1.414-1.414L9.414 13H20a1 1 0 1 0 0-2H9.414l5.293-5.293a1 1 0 0 0-1.414-1.414z" />
-      )}
-      {!left && (
-        <path d="m20 13-1.586 0-5.293 5.293a1 1 0 1 0 1.414 1.414l6-6a1 1 0 0 0 0-1.414l-6-6a1 1 0 0 0-1.414 1.414L18.414 11H4a1 1 0 0 0 0 2z" />
-      )}
-    </svg>
-  );
-}
-
 export default HotCollections;
+
+
+
 
 
 
