@@ -9,45 +9,35 @@ const NewItems = () => {
   const [items, setItems] = useState([]);
   const [loaded, setLoaded] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [, setScreen] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setScreen(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const [sliderRef, instanceRef] = useKeenSlider({
     loop: true,
-    slides: {
-      perView: 4,
-      spacing: 30,
-    },
+    slides: { perView: 4, spacing: 30 },
     breakpoints: {
-      "(max-width: 1024px)": {
-        slides: { perView: 3, spacing: 25 },
-      },
-      "(max-width: 768px)": {
-        slides: { perView: 2, spacing: 20 },
-      },
-      "(max-width: 480px)": {
-        slides: { perView: 1, spacing: 15 },
-      },
+      "(max-width: 1024px)": { slides: { perView: 3, spacing: 20 } },
+      "(max-width: 768px)": { slides: { perView: 2, spacing: 10 } },
+      "(max-width: 580px)": { slides: { perView: 1, spacing: 5 } },
     },
-    created() {
-      setLoaded(true);
-    },
+    created() { setLoaded(true); },
   });
 
-  // Update countdown every second and reset expired timers
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
-      
-      // Reset expired timers by adding random time between 1-24 hours
-      setItems(prevItems =>
-        prevItems.map(item => {
-          const now = new Date().getTime();
+      setItems(prev =>
+        prev.map(item => {
+          const now = Date.now();
           const expiry = new Date(item.expiryDate).getTime();
           if (expiry <= now) {
             const randomHours = Math.floor(Math.random() * 24) + 1;
-            return {
-              ...item,
-              expiryDate: new Date(now + randomHours * 60 * 60 * 1000).toISOString()
-            };
+            return { ...item, expiryDate: new Date(now + randomHours * 3600000).toISOString() };
           }
           return item;
         })
@@ -59,50 +49,15 @@ const NewItems = () => {
   useEffect(() => {
     async function fetchNewItems() {
       try {
-        const response = await fetch(
-          "https://us-central1-nft-cloud-functions.cloudfunctions.net/newItems"
-        );
+        const response = await fetch("https://us-central1-nft-cloud-functions.cloudfunctions.net/newItems");
         const data = await response.json();
         setItems(data);
-      } catch (error) {
-        console.error("Error fetching new items:", error);
+      } catch {
         setItems([
-          {
-            id: 1,
-            nftImage: nftImage,
-            authorImage: AuthorImage,
-            title: "Pinky Ocean",
-            price: "5.07 ETH",
-            likes: 69,
-            expiryDate: new Date(Date.now() + 2*60*60*1000 + 56*60*1000 + 39*1000).toISOString()
-          },
-          {
-            id: 2,
-            nftImage: nftImage,
-            authorImage: AuthorImage,
-            title: "Deep Sea Phantasy",
-            price: "0.17 ETH",
-            likes: 99,
-            expiryDate: new Date(Date.now() + 4*60*60*1000 + 15*60*1000 + 22*1000).toISOString()
-          },
-          {
-            id: 3,
-            nftImage: nftImage,
-            authorImage: AuthorImage,
-            title: "Rainbow Style",
-            price: "0.18 ETH",
-            likes: 17,
-            expiryDate: new Date(Date.now() + 1*60*60*1000 + 45*60*1000 + 10*1000).toISOString()
-          },
-          {
-            id: 4,
-            nftImage: nftImage,
-            authorImage: AuthorImage,
-            title: "Two Tigers",
-            price: "0.77 ETH",
-            likes: 16,
-            expiryDate: new Date(Date.now() - 10*60*1000).toISOString()
-          }
+          { id: 1, nftImage, authorImage: AuthorImage, title: "Pinky Ocean", price: "5.07 ETH", likes: 69, expiryDate: new Date(Date.now() + 4000000).toISOString() },
+          { id: 2, nftImage, authorImage: AuthorImage, title: "Deep Sea Phantasy", price: "0.17 ETH", likes: 99, expiryDate: new Date(Date.now() + 9000000).toISOString() },
+          { id: 3, nftImage, authorImage: AuthorImage, title: "Rainbow Style", price: "0.18 ETH", likes: 17, expiryDate: new Date(Date.now() + 2900000).toISOString() },
+          { id: 4, nftImage, authorImage: AuthorImage, title: "Two Tigers", price: "0.77 ETH", likes: 16, expiryDate: new Date(Date.now() - 1000).toISOString() }
         ]);
       }
     }
@@ -113,7 +68,6 @@ const NewItems = () => {
     const now = currentTime.getTime();
     const expiry = new Date(expiryDate).getTime();
     const difference = expiry - now;
-    
     if (difference > 0) {
       const hours = Math.floor(difference / (1000 * 60 * 60));
       const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
@@ -124,94 +78,45 @@ const NewItems = () => {
     }
   };
 
-  const cardStyle = {
-    border: "1px solid #e0e0e0",
-    borderRadius: "16px",
-    boxShadow: "0 8px 25px rgba(52, 111, 255, 0.12)",
-    transition: "all 0.3s ease",
-    backgroundColor: "#fff",
-    overflow: "hidden",
-    maxWidth: "320px",
-    margin: "0 auto"
-  };
-
-  const headerStyle = {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "15px 20px",
-    backgroundColor: "#fff"
-  };
-
-  const authorStyle = {
-    position: "relative"
-  };
-
-  const authorImageStyle = {
-    width: "50px",
-    height: "50px",
-    borderRadius: "50%",
-    border: "3px solid #fff",
-    backgroundColor: "#fff",
-    boxShadow: "0 3px 10px rgba(0,0,0,0.1)"
-  };
+  // Responsive helpers
+  function getCardStyle() {
+    if (window.innerWidth <= 580) return { border: "1px solid #e0e0e0", borderRadius: 12, width: "97vw", minWidth: 0, margin: "0 auto 18px", background: "#fff" };
+    if (window.innerWidth <= 768) return { border: "1px solid #e0e0e0", borderRadius: 14, width: "88vw", maxWidth: 320, minWidth: 0, margin: "0 auto 18px", background: "#fff" };
+    return { border: "1px solid #e0e0e0", borderRadius: 16, width: 320, margin: "0 auto", minWidth: 0, background: "#fff" }
+  }
+  function getImageStyle() {
+    if (window.innerWidth <= 580) return { width: "100%", height: 110, objectFit: "cover" };
+    if (window.innerWidth <= 768) return { width: "100%", height: 135, objectFit: "cover" };
+    return { width: "100%", height: 200, objectFit: "cover" }
+  }
+  function getAuthorImgStyle() {
+    let size = window.innerWidth <= 580 ? 30 : window.innerWidth <= 768 ? 36 : 45;
+    return { width: size, height: size, borderRadius: "50%", border: "2px solid #fff", boxShadow: "0 2px 5px rgba(0,0,0,0.13)", background: "#fff" }
+  }
+  function getHeaderStyle() {
+    const padding = window.innerWidth <= 580 ? "6px 10px 4px" : "12px 18px 8px";
+    return { display: "flex", alignItems: "center", justifyContent: "space-between", padding, background: "#fff" }
+  }
+  function getArrowStyle(side="left") {
+    let size = window.innerWidth <= 580 ? 29 : 38;
+    let pos = side === "left" ? { left: 2 } : { right: 2 };
+    return { width: size, height: size, background: "#fff", border: "1px solid #eee", borderRadius: "50%", color: "#444", position: "absolute", top: "50%", transform: "translateY(-50%)", zIndex: 9, fontSize: size*0.65, boxShadow: "0 2px 7px rgba(0,0,0,0.08)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", ...pos }
+  }
 
   const checkIconStyle = {
     position: "absolute",
     bottom: "2px",
     right: "2px",
     background: "#007bff",
-    color: "white",
+    color: "#fff",
     borderRadius: "50%",
-    width: "16px",
-    height: "16px",
-    fontSize: "8px",
+    width: "13px",
+    height: "13px",
+    fontSize: "7px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    border: "2px solid #fff"
-  };
-
-  const countdownStyle = {
-    padding: "6px 12px",
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
-    border: "1px solid rgba(0,0,0,0.1)",
-    borderRadius: "20px",
-    fontSize: "12px",
-    fontWeight: "600",
-    color: "#333"
-  };
-
-  const imageStyle = {
-    width: "100%",
-    height: "200px",
-    objectFit: "cover"
-  };
-
-  const infoStyle = {
-    padding: "20px"
-  };
-
-  const titleStyle = {
-    fontWeight: "700",
-    fontSize: "1.2rem",
-    marginBottom: "10px",
-    color: "#212529"
-  };
-
-  const priceStyle = {
-    fontSize: "1rem",
-    color: "#007bff",
-    fontWeight: "600",
-    marginBottom: "8px"
-  };
-
-  const likesStyle = {
-    fontSize: "0.9rem",
-    color: "#6c757d",
-    display: "flex",
-    alignItems: "center",
-    gap: "5px"
+    border: "2px solid #fff",
   };
 
   return (
@@ -225,45 +130,41 @@ const NewItems = () => {
             </div>
           </div>
         </div>
-
         <div style={{ position: "relative", margin: "40px 0" }}>
           <div ref={sliderRef} className="keen-slider">
             {items.map((item) => (
               <div className="keen-slider__slide" key={item.id}>
-                <div style={cardStyle}>
-                  {/* Author and Countdown in white space above image */}
-                  <div style={headerStyle}>
-                    <div style={authorStyle}>
+                <div style={getCardStyle()}>
+                  <div style={getHeaderStyle()}>
+                    <div style={{ position: "relative" }}>
                       <Link to="/author">
-                        <img
-                          src={item.authorImage}
-                          alt="Author"
-                          style={authorImageStyle}
-                        />
+                        <img src={item.authorImage} alt="Author" style={getAuthorImgStyle()} />
                         <i className="fa fa-check" style={checkIconStyle}></i>
                       </Link>
                     </div>
-                    <div style={countdownStyle}>
+                    <div style={{
+                      padding: "5px 12px",
+                      background: "#fff",
+                      border: "1px solid #eee",
+                      borderRadius: 18,
+                      fontSize: "12px",
+                      minWidth: 60,
+                      textAlign: "center",
+                      color: "#222",
+                      fontWeight: 600,
+                    }}>
                       {calculateCountdown(item.expiryDate)}
                     </div>
                   </div>
-
-                  {/* NFT Image */}
                   <Link to="/item-details">
-                    <img
-                      src={item.nftImage}
-                      alt={item.title}
-                      style={imageStyle}
-                    />
+                    <img src={item.nftImage} alt={item.title} style={getImageStyle()} />
                   </Link>
-
-                  {/* Item Info */}
-                  <div style={infoStyle}>
+                  <div style={{ padding: "16px" }}>
                     <Link to="/item-details">
-                      <h4 style={titleStyle}>{item.title}</h4>
+                      <h4 style={{ fontWeight: 700, fontSize: "1.08rem", marginBottom: 7, color: "#212529" }}>{item.title}</h4>
                     </Link>
-                    <div style={priceStyle}>{item.price}</div>
-                    <div style={likesStyle}>
+                    <div style={{ fontSize: "1rem", color: "#007bff", fontWeight: 600, marginBottom: 6 }}>{item.price}</div>
+                    <div style={{ fontSize: "0.89rem", color: "#6c757d", display: "flex", alignItems: "center", gap: 5 }}>
                       <i className="fa fa-heart"></i>
                       <span>{item.likes}</span>
                     </div>
@@ -272,64 +173,22 @@ const NewItems = () => {
               </div>
             ))}
           </div>
-
           {loaded && instanceRef.current && items.length > 0 && (
             <>
               <div
-                style={{
-                  position: "absolute",
-                  left: "-30px",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  width: "45px",
-                  height: "45px",
-                  backgroundColor: "rgba(255, 255, 255, 0.95)",
-                  borderRadius: "50%",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  zIndex: 10,
-                  boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
-                  fontSize: "18px",
-                  fontWeight: "bold",
-                  color: "#212529"
-                }}
-                onClick={(e) => {
+                style={getArrowStyle("left")}
+                onClick={e => {
                   e.stopPropagation();
                   instanceRef.current?.prev();
                 }}
-              >
-                ‹
-              </div>
-
+              >&#8249;</div>
               <div
-                style={{
-                  position: "absolute",
-                  right: "-30px",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  width: "45px",
-                  height: "45px",
-                  backgroundColor: "rgba(255, 255, 255, 0.95)",
-                  borderRadius: "50%",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  zIndex: 10,
-                  boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
-                  fontSize: "18px",
-                  fontWeight: "bold",
-                  color: "#212529"
-                }}
-                onClick={(e) => {
+                style={getArrowStyle("right")}
+                onClick={e => {
                   e.stopPropagation();
                   instanceRef.current?.next();
                 }}
-              >
-                ›
-              </div>
+              >&#8250;</div>
             </>
           )}
         </div>
@@ -339,6 +198,11 @@ const NewItems = () => {
 };
 
 export default NewItems;
+
+
+
+
+
 
 
 
