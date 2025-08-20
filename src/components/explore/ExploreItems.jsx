@@ -8,7 +8,6 @@ const ExploreItems = () => {
   const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  // Update countdown every second
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -29,41 +28,27 @@ const ExploreItems = () => {
     } catch (error) {
       console.error("API Error:", error);
       setItems([
-        { 
-          id: 1, 
-          title: "Pinky Ocean", 
-          price: 5.07, 
-          likes: 69, 
-          nftImage: "https://via.placeholder.com/300x200/ff69b4/ffffff?text=Pinky+Ocean", 
-          authorImage: "https://via.placeholder.com/50x50/007bff/ffffff?text=A",
+        {
+          id: 1,
+          nftId: 10147817,
+          title: "Pinky Ocean",
+          price: 5.07,
+          likes: 69,
+          nftImage: "https://nft-place.web.app/static/media/static-1.0299eed903ee71c8c953.jpg",
+          authorImage: "https://nft-place.web.app/static/media/author-1.04ee784f53cbe427d362.jpg",
+          authorId: 83937449,
           expiryDate: Date.now() + 43 * 60 * 1000 + 45 * 1000
         },
-        { 
-          id: 2, 
-          title: "Deep Sea Phantasy", 
-          price: 0.17, 
-          likes: 99, 
-          nftImage: "https://via.placeholder.com/300x200/006994/ffffff?text=Deep+Sea", 
-          authorImage: "https://via.placeholder.com/50x50/28a745/ffffff?text=B",
+        {
+          id: 2,
+          nftId: 92975188,
+          title: "Deep Sea Phantasy",
+          price: 0.17,
+          likes: 99,
+          nftImage: "https://nft-place.web.app/static/media/static-2.f38fe0e74860176d8f2d.jpg",
+          authorImage: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD...",
+          authorId: 55757699,
           expiryDate: Date.now() + 2 * 60 * 60 * 1000 + 43 * 60 * 1000 + 45 * 1000
-        },
-        { 
-          id: 3, 
-          title: "Rainbow Style", 
-          price: 0.18, 
-          likes: 17, 
-          nftImage: "https://via.placeholder.com/300x200/ffc107/ffffff?text=Rainbow", 
-          authorImage: "https://via.placeholder.com/50x50/dc3545/ffffff?text=C",
-          expiryDate: Date.now() + 1 * 60 * 60 * 1000 + 15 * 60 * 1000
-        },
-        { 
-          id: 4, 
-          title: "Two Tigers", 
-          price: 0.77, 
-          likes: 16, 
-          nftImage: "https://via.placeholder.com/300x200/fd7e14/ffffff?text=Tigers", 
-          authorImage: "https://via.placeholder.com/50x50/6f42c1/ffffff?text=D",
-          expiryDate: Date.now() + 3 * 60 * 60 * 1000 + 22 * 60 * 1000
         }
       ]);
     }
@@ -107,7 +92,6 @@ const ExploreItems = () => {
         return `${minutes}m ${seconds}s`;
       }
     } else {
-      // Timer expired - reset to new random time (1-24 hours)
       const newExpiry = Date.now() + Math.random() * 24 * 60 * 60 * 1000;
       
       setItems(prevItems => 
@@ -124,13 +108,6 @@ const ExploreItems = () => {
 
   const showMore = () => {
     setVisible(prev => Math.min(prev + 4, 16));
-  };
-
-  // Skeleton loading styles
-  const skeletonStyle = {
-    backgroundColor: "#f0f0f0",
-    borderRadius: "8px",
-    animation: "pulse 1.5s ease-in-out infinite alternate"
   };
 
   const cardStyle = {
@@ -213,34 +190,23 @@ const ExploreItems = () => {
     gap: "4px"
   };
 
-  // Skeleton Card Component
   const SkeletonCard = () => (
     <div className="col-lg-3 col-md-6 mb-3">
       <div style={cardStyle}>
-        {/* Header skeleton */}
         <div style={headerStyle}>
-          <div style={{ ...skeletonStyle, width: "32px", height: "32px", borderRadius: "50%" }}></div>
-          <div style={{ ...skeletonStyle, width: "80px", height: "20px", borderRadius: "16px" }}></div>
+          <div style={{ ...{ backgroundColor: "#f0f0f0", animation: "pulse 1.5s ease-in-out infinite alternate" }, width: "32px", height: "32px", borderRadius: "50%" }}></div>
+          <div style={{ ...{ backgroundColor: "#f0f0f0", animation: "pulse 1.5s ease-in-out infinite alternate" }, width: "80px", height: "20px", borderRadius: "16px" }}></div>
         </div>
-        
-        {/* Image skeleton */}
-        <div style={{ ...skeletonStyle, ...imageStyle }}></div>
-        
-        {/* Title skeleton */}
-        <div style={{ ...skeletonStyle, width: "70%", height: "20px", marginBottom: "8px" }}></div>
-        
-        {/* Price skeleton */}
-        <div style={{ ...skeletonStyle, width: "50%", height: "16px", marginBottom: "4px" }}></div>
-        
-        {/* Likes skeleton */}
-        <div style={{ ...skeletonStyle, width: "40%", height: "14px" }}></div>
+        <div style={{ ...{ backgroundColor: "#f0f0f0", animation: "pulse 1.5s ease-in-out infinite alternate" }, ...imageStyle }}></div>
+        <div style={{ ...{ backgroundColor: "#f0f0f0", animation: "pulse 1.5s ease-in-out infinite alternate" }, width: "70%", height: "20px", marginBottom: "8px" }}></div>
+        <div style={{ ...{ backgroundColor: "#f0f0f0", animation: "pulse 1.5s ease-in-out infinite alternate" }, width: "50%", height: "16px", marginBottom: "4px" }}></div>
+        <div style={{ ...{ backgroundColor: "#f0f0f0", animation: "pulse 1.5s ease-in-out infinite alternate" }, width: "40%", height: "14px" }}></div>
       </div>
     </div>
   );
 
   return (
     <div>
-      {/* CSS for pulse animation */}
       <style>
         {`
           @keyframes pulse {
@@ -259,33 +225,30 @@ const ExploreItems = () => {
 
       <div className="row">
         {loading ? (
-          // Show 8 skeleton cards while loading
           Array.from({ length: 8 }).map((_, index) => (
             <SkeletonCard key={`skeleton-${index}`} />
           ))
         ) : (
-          // Show actual cards when loaded
           items.slice(0, visible).map(item => (
             <div key={item.id} className="col-lg-3 col-md-6 mb-3">
               <div style={cardStyle}>
-                {/* Header with author and countdown */}
                 <div style={headerStyle}>
-                  <div style={{ position: "relative" }}>
+                  <Link to={`/author/${item.authorId}`} style={{ position: "relative" }}>
                     <img src={item.authorImage} alt="Author" style={authorImageStyle} />
                     <i className="fa fa-check" style={checkmarkStyle}></i>
-                  </div>
+                  </Link>
                   <div style={countdownStyle}>
                     {calculateCountdown(item.expiryDate, item.id)}
                   </div>
                 </div>
 
-                {/* NFT Image */}
-                <Link to="/item-details">
+                {/* UPDATED: Dynamic NFT link */}
+                <Link to={`/item-details/${item.nftId}`}>
                   <img src={item.nftImage} alt={item.title} style={imageStyle} />
                 </Link>
 
-                {/* Item Info */}
-                <Link to="/item-details" style={{ textDecoration: "none" }}>
+                {/* UPDATED: Dynamic NFT link */}
+                <Link to={`/item-details/${item.nftId}`} style={{ textDecoration: "none" }}>
                   <h5 style={titleStyle}>{item.title}</h5>
                 </Link>
                 <div style={priceStyle}>{item.price} ETH</div>
@@ -299,7 +262,7 @@ const ExploreItems = () => {
         )}
       </div>
 
-      {!loading && visible < items.length && visible < 16 && (
+      {visible < items.length && visible < 16 && !loading && (
         <div className="text-center mt-4">
           <Link 
             to="#" 
@@ -318,6 +281,7 @@ const ExploreItems = () => {
 };
 
 export default ExploreItems;
+
 
 
 

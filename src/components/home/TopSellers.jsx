@@ -19,28 +19,30 @@ const TopSellers = () => {
           "https://us-central1-nft-cloud-functions.cloudfunctions.net/topSellers"
         );
         const data = await response.json();
+        console.log("TopSellers API Data:", data);
         setSellers(data);
       } catch (error) {
+        console.error("TopSellers API Error:", error);
         setSellers([
-          { id: 1, authorImage: AuthorImage, authorName: "Monica Lucas", price: "1.2" },
-          { id: 2, authorImage: AuthorImage, authorName: "Lori Hart", price: "7.2" },
-          { id: 3, authorImage: AuthorImage, authorName: "Gayle Hicks", price: "2.7" },
-          { id: 4, authorImage: AuthorImage, authorName: "Stacy Long", price: "1.3" },
-          { id: 5, authorImage: AuthorImage, authorName: "Mamie Barnett", price: "4.4" },
-          { id: 6, authorImage: AuthorImage, authorName: "Jimmy Wright", price: "2.8" },
-          { id: 7, authorImage: AuthorImage, authorName: "Claude Banks", price: "3.8" },
-          { id: 8, authorImage: AuthorImage, authorName: "Ida Chapman", price: "5.2" },
-          { id: 9, authorImage: AuthorImage, authorName: "Fred Ryan", price: "0.7" },
-          { id: 10, authorImage: AuthorImage, authorName: "Nicholas Daniels", price: "4.2" },
-          { id: 11, authorImage: AuthorImage, authorName: "Karla Sharp", price: "1.2" },
-          { id: 12, authorImage: AuthorImage, authorName: "Franklin Greer", price: "1.1" }
+          { id: 1, authorImage: AuthorImage, authorName: "Monica Lucas", price: "1.2", authorId: 83937449 },
+          { id: 2, authorImage: AuthorImage, authorName: "Lori Hart", price: "7.2", authorId: 73855012 },
+          { id: 3, authorImage: AuthorImage, authorName: "Gayle Hicks", price: "2.7", authorId: 55757699 },
+          { id: 4, authorImage: AuthorImage, authorName: "Stacy Long", price: "1.3", authorId: 31906377 },
+          { id: 5, authorImage: AuthorImage, authorName: "Mamie Barnett", price: "4.4", authorId: 18556210 },
+          { id: 6, authorImage: AuthorImage, authorName: "Jimmy Wright", price: "2.8", authorId: 83937449 },
+          { id: 7, authorImage: AuthorImage, authorName: "Claude Banks", price: "3.8", authorId: 73855012 },
+          { id: 8, authorImage: AuthorImage, authorName: "Ida Chapman", price: "5.2", authorId: 55757699 },
+          { id: 9, authorImage: AuthorImage, authorName: "Fred Ryan", price: "0.7", authorId: 31906377 },
+          { id: 10, authorImage: AuthorImage, authorName: "Nicholas Daniels", price: "4.2", authorId: 18556210 },
+          { id: 11, authorImage: AuthorImage, authorName: "Karla Sharp", price: "1.2", authorId: 83937449 },
+          { id: 12, authorImage: AuthorImage, authorName: "Franklin Greer", price: "1.1", authorId: 73855012 }
         ]);
       }
     }
     fetchTopSellers();
   }, []);
 
-  // Responsive grid: 4 columns desktop, 2 columns tablet, 1 column mobile
+  // All your existing style functions stay the same...
   function getGridStyle() {
     const w = window.innerWidth;
     if (w <= 600) {
@@ -106,7 +108,6 @@ const TopSellers = () => {
     textAlign: "right",
   };
 
-  // Name and price stacked
   const textContainerStyle = {
     display: "flex",
     flexDirection: "column",
@@ -154,19 +155,37 @@ const TopSellers = () => {
   };
 
   return (
-    <section id="section-popular" className="pb-5">
+    <section 
+      id="section-popular" 
+      className="pb-5"
+      style={{ 
+        paddingTop: "80px", 
+        paddingBottom: "100px" // Add extra bottom padding
+      }}
+    >
       <div className="container">
         <div className="row">
-          <div className="col-lg-12">
+          <div className="col-lg-12" data-aos="fade-up" data-aos-delay="100">
             <div className="text-center">
               <h2>Top Sellers</h2>
               <div className="small-border bg-color-2"></div>
             </div>
           </div>
-          <div className="col-md-12" style={{ marginTop: "38px" }}>
+          <div 
+            className="col-md-12" 
+            style={{ marginTop: "38px" }}
+            data-aos="fade-up" 
+            data-aos-delay="300"
+          >
             <ol style={getGridStyle()}>
               {sellers.map((seller, index) => (
-                <li key={seller.id} style={getItemStyle()}>
+                <li 
+                  key={seller.id} 
+                  style={getItemStyle()}
+                  data-aos="zoom-in" 
+                  data-aos-delay={400 + (index * 50)}
+                  data-aos-duration="600"
+                >
                   <span style={positionStyle}>{index + 1}.</span>
                   <div style={{ position: "relative" }}>
                     <img
@@ -177,7 +196,7 @@ const TopSellers = () => {
                     <i className="fa fa-check" style={checkIconStyle}></i>
                   </div>
                   <div style={textContainerStyle}>
-                    <Link to="/author" style={nameStyle}>
+                    <Link to={`/author/${seller.authorId}`} style={nameStyle}>
                       {seller.authorName}
                     </Link>
                     <span style={priceStyle}>
@@ -195,3 +214,4 @@ const TopSellers = () => {
 };
 
 export default TopSellers;
+
