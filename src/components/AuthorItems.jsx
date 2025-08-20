@@ -19,7 +19,7 @@ const AuthorItems = ({ authorData }) => {
     if (authorData && authorData.nftCollection) {
       const processedItems = authorData.nftCollection.map(item => ({
         id: item.id,
-        nftId: item.nftId, // Make sure to include nftId
+        nftId: item.nftId,
         nftImage: item.nftImage,
         authorImage: authorData.authorImage || AuthorImage,
         title: item.title,
@@ -95,7 +95,25 @@ const AuthorItems = ({ authorData }) => {
                       <i className="fa fa-check"></i>
                     </Link>
                   </div>
-                  <div className="de_countdown">
+                  {/* UPDATED: Bigger and bolder timer text */}
+                  <div 
+                    className="de_countdown"
+                    style={{
+                      background: "rgba(255,255,255,0.95)",
+                      border: "1px solid #d0d0d0",
+                      borderRadius: "14px",
+                      padding: "6px 12px",
+                      fontSize: "12px",        // Increased from 10px
+                      fontWeight: 700,        // Increased from 600 to 700 (bolder)
+                      color: "#333",
+                      textAlign: "center",
+                      minWidth: "60px",       // Slightly wider for bigger text
+                      position: "absolute",
+                      top: "12px",
+                      right: "12px",
+                      zIndex: 10
+                    }}
+                  >
                     {calculateCountdown(item.expiryDate, item.id)}
                   </div>
                   <div className="nft__item_wrap">
@@ -116,7 +134,6 @@ const AuthorItems = ({ authorData }) => {
                         </div>
                       </div>
                     </div>
-                    {/* UPDATED: Dynamic NFT link */}
                     <Link to={`/item-details/${item.nftId}`}>
                       <img
                         src={item.nftImage || nftImage}
@@ -126,7 +143,6 @@ const AuthorItems = ({ authorData }) => {
                     </Link>
                   </div>
                   <div className="nft__item_info">
-                    {/* UPDATED: Dynamic NFT link */}
                     <Link to={`/item-details/${item.nftId}`}>
                       <h4>{item.title}</h4>
                     </Link>
@@ -152,5 +168,4 @@ const AuthorItems = ({ authorData }) => {
 };
 
 export default AuthorItems;
-
 

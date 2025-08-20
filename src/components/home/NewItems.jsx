@@ -9,23 +9,20 @@ const NewItems = () => {
   const [items, setItems] = useState([]);
   const [loaded, setLoaded] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [, setScreen] = useState(window.innerWidth);
-
-  useEffect(() => {
-    const handleResize = () => setScreen(window.innerWidth);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   const [sliderRef, instanceRef] = useKeenSlider({
     loop: true,
-    slides: { perView: 4, spacing: 30 },
-    breakpoints: {
-      "(max-width: 1024px)": { slides: { perView: 3, spacing: 20 } },
-      "(max-width: 768px)": { slides: { perView: 2, spacing: 10 } },
-      "(max-width: 580px)": { slides: { perView: 1, spacing: 5 } },
+    slides: {
+      perView: 4,
+      spacing: 20,
     },
-    created() { setLoaded(true); },
+    breakpoints: {
+      "(max-width: 900px)": { slides: { perView: 2, spacing: 15 } },
+      "(max-width: 600px)": { slides: { perView: 1, spacing: 10 } },
+    },
+    created() {
+      setLoaded(true);
+    },
   });
 
   useEffect(() => {
@@ -51,36 +48,29 @@ const NewItems = () => {
       try {
         const response = await fetch("https://us-central1-nft-cloud-functions.cloudfunctions.net/newItems");
         const data = await response.json();
-        console.log("NewItems API Data:", data);
         setItems(data);
       } catch (error) {
-        console.error("NewItems API Error:", error);
         setItems([
-          { 
-            id: 1, nftId: 10147817, nftImage, authorImage: AuthorImage, 
-            title: "Pinky Ocean", price: "5.07", likes: 69, authorId: 83937449,
-            expiryDate: new Date(Date.now() + 4000000).toISOString() 
-          },
-          { 
-            id: 2, nftId: 92975188, nftImage, authorImage: AuthorImage, 
-            title: "Deep Sea Phantasy", price: "0.17", likes: 99, authorId: 55757699,
-            expiryDate: new Date(Date.now() + 9000000).toISOString() 
-          },
-          { 
-            id: 3, nftId: 34521163, nftImage, authorImage: AuthorImage, 
-            title: "Rainbow Style", price: "0.18", likes: 17, authorId: 31906377,
-            expiryDate: new Date(Date.now() + 2900000).toISOString() 
-          },
-          { 
-            id: 4, nftId: 85809749, nftImage, authorImage: AuthorImage, 
-            title: "Two Tigers", price: "0.77", likes: 16, authorId: 73855012,
-            expiryDate: new Date(Date.now() - 1000).toISOString() 
-          }
+          { id: 1, nftId: 10147817, nftImage, authorImage: AuthorImage, title: "Pinky Ocean", price: "5.07", likes: 69, authorId: 83937449, expiryDate: new Date(Date.now() + 4000000).toISOString() },
+          { id: 2, nftId: 92975188, nftImage, authorImage: AuthorImage, title: "Deep Sea Phantasy", price: "0.17", likes: 99, authorId: 55757699, expiryDate: new Date(Date.now() + 9000000).toISOString() },
+          { id: 3, nftId: 34521163, nftImage, authorImage: AuthorImage, title: "Rainbow Style", price: "0.18", likes: 17, authorId: 31906377, expiryDate: new Date(Date.now() + 2900000).toISOString() },
+          { id: 4, nftId: 85809749, nftImage, authorImage: AuthorImage, title: "Two Tigers", price: "0.77", likes: 16, authorId: 73855012, expiryDate: new Date(Date.now() - 1000).toISOString() },
+          { id: 5, nftId: 85809750, nftImage, authorImage: AuthorImage, title: "Galaxy Dreams", price: "1.23", likes: 45, authorId: 73855013, expiryDate: new Date(Date.now() + 7000000).toISOString() },
+          { id: 6, nftId: 85809751, nftImage, authorImage: AuthorImage, title: "Ocean Waves", price: "0.89", likes: 33, authorId: 73855014, expiryDate: new Date(Date.now() + 5000000).toISOString() }
         ]);
       }
     }
     fetchNewItems();
   }, []);
+
+  // FIX: Force slider update when items load
+  useEffect(() => {
+    if (items.length && instanceRef.current) {
+      setTimeout(() => {
+        instanceRef.current.update();
+      }, 100);
+    }
+  }, [items]);
 
   const calculateCountdown = (expiryDate) => {
     const now = currentTime.getTime();
@@ -96,125 +86,36 @@ const NewItems = () => {
     }
   };
 
-  // Card with white header area
-  const cardBase = {
-    border: "1px solid #e0e0e0",
-    borderRadius: 16,
-    backgroundColor: "#fff",
-    padding: 0,
-    transition: "all 0.3s ease",
-    overflow: "hidden",
-    maxWidth: 320,
-    margin: "0 auto",
-    width: "100%",
-    minWidth: 0,
-    display: "flex",
-    flexDirection: "column",
-    cursor: "pointer",
-  };
-
-  function getResponsiveCardStyle() {
-    if (window.innerWidth <= 600) return { ...cardBase, maxWidth: "98vw" };
-    if (window.innerWidth <= 900) return { ...cardBase, maxWidth: 300 };
-    if (window.innerWidth <= 1200) return { ...cardBase, maxWidth: 260 };
-    return cardBase;
-  }
-
-  // White header area with profile and timer
-  const headerStyle = {
-    padding: "12px 16px 8px 16px",
-    backgroundColor: "#fff",
-    position: "relative",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center"
-  };
-
-  // Profile image style
-  function getProfileImageStyle() {
-    let size = 50;
-    if (window.innerWidth <= 600) size = 36;
-    else if (window.innerWidth <= 900) size = 42;
-    else if (window.innerWidth <= 1200) size = 46;
-    return {
-      width: size,
-      height: size,
-      borderRadius: "50%",
-      border: "3px solid #fff",
-      backgroundColor: "#fff",
-      boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-      display: "block",
-    };
-  }
-
-  // Timer style
-  const timerStyle = {
-    padding: "6px 12px",
-    background: "rgba(255,255,255,0.95)",
-    border: "1px solid #d0d0d0",
-    borderRadius: 16,
-    fontSize: "11px",
-    fontWeight: 600,
-    color: "#333",
-    minWidth: 60,
-    textAlign: "center"
-  };
-
-  // Image style
-  const imageBase = {
-    width: "100%",
-    objectFit: "cover",
-    height: 180,
-    display: "block",
-    transition: "transform 0.3s ease",
-  };
-
-  function getResponsiveImageStyle() {
-    if (window.innerWidth <= 600) return { ...imageBase, height: 135 };
-    if (window.innerWidth <= 900) return { ...imageBase, height: 150 };
-    if (window.innerWidth <= 1200) return { ...imageBase, height: 170 };
-    return imageBase;
-  }
-
-  function getArrowStyle(side="left") {
-    let size = window.innerWidth <= 580 ? 29 : 38;
-    let pos = side === "left" ? { left: 2 } : { right: 2 };
-    return { 
-      width: size, height: size, background: "#fff", border: "1px solid #e0e0e0", 
-      borderRadius: "50%", color: "#444", position: "absolute", top: "50%", 
-      transform: "translateY(-50%)", zIndex: 9, fontSize: size*0.65, 
-      boxShadow: "0 2px 7px rgba(0,0,0,0.08)", display: "flex", 
-      alignItems: "center", justifyContent: "center", cursor: "pointer", ...pos 
-    }
-  }
-
-  const infoStyle = {
-    padding: "16px 18px 18px 18px",
-    textAlign: "left",
-  };
-
   return (
     <section id="section-items" className="no-bottom" style={{ paddingBottom: "80px" }}>
       <div className="container">
         <div className="row">
-          <div className="col-lg-12" data-aos="fade-up" data-aos-delay="100">
+          <div className="col-lg-12">
             <div className="text-center">
               <h2>New Items</h2>
               <div className="small-border bg-color-2"></div>
             </div>
           </div>
         </div>
-        <div 
-          style={{ position: "relative", margin: "40px 0" }}
-          data-aos="fade-up" 
-          data-aos-delay="300"
-          data-aos-duration="1000"
-        >
-          <div ref={sliderRef} className="keen-slider">
+        
+        <div style={{ position: "relative", margin: "40px 0", padding: "0 30px" }}>
+          {/* Force remount with key when items change */}
+          <div key={items.length} ref={sliderRef} className="keen-slider">
             {items.map((item) => (
               <div className="keen-slider__slide" key={item.id}>
-                <div 
-                  style={getResponsiveCardStyle()}
+                <div
+                  style={{
+                    border: "1px solid #e0e0e0",
+                    borderRadius: 16,
+                    backgroundColor: "#fff",
+                    padding: 0,
+                    overflow: "hidden",
+                    cursor: "pointer",
+                    display: "flex",
+                    flexDirection: "column",
+                    height: "100%",
+                    width: "100%",
+                  }}
                   onMouseEnter={(e) => {
                     const img = e.currentTarget.querySelector('img.nft-image');
                     if (img) img.style.transform = 'scale(1.05)';
@@ -224,15 +125,27 @@ const NewItems = () => {
                     if (img) img.style.transform = 'scale(1)';
                   }}
                 >
-                  {/* WHITE HEADER AREA with profile and timer */}
-                  <div style={headerStyle}>
+                  {/* WHITE HEADER with profile and timer */}
+                  <div style={{
+                    padding: "12px 16px 8px 16px",
+                    backgroundColor: "#fff",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center"
+                  }}>
                     <div style={{ position: "relative" }}>
                       <Link to={`/author/${item.authorId}`}>
                         <img
                           src={item.authorImage}
                           alt="Author"
-                          className="lazy pp-coll"
-                          style={getProfileImageStyle()}
+                          style={{
+                            width: 45,
+                            height: 45,
+                            borderRadius: "50%",
+                            border: "3px solid #fff",
+                            backgroundColor: "#fff",
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                          }}
                         />
                         <i
                           className="fa fa-check"
@@ -243,19 +156,29 @@ const NewItems = () => {
                             background: "#007bff",
                             color: "#fff",
                             borderRadius: "50%",
-                            width: 16,
-                            height: 16,
-                            fontSize: 8,
+                            width: 14,
+                            height: 14,
+                            fontSize: 7,
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
                             border: "2px solid #fff",
                           }}
-                        ></i>
+                        />
                       </Link>
                     </div>
                     
-                    <div style={timerStyle}>
+                    <div style={{
+                      padding: "5px 10px",
+                      background: "rgba(255,255,255,0.95)",
+                      border: "1px solid #d0d0d0",
+                      borderRadius: 14,
+                      fontSize: "10px",
+                      fontWeight: 600,
+                      color: "#333",
+                      minWidth: 50,
+                      textAlign: "center"
+                    }}>
                       {calculateCountdown(item.expiryDate)}
                     </div>
                   </div>
@@ -265,39 +188,45 @@ const NewItems = () => {
                     <img
                       src={item.nftImage}
                       alt={item.title}
-                      className="lazy img-fluid nft-image"
-                      style={getResponsiveImageStyle()}
+                      className="nft-image"
+                      style={{
+                        width: "100%",
+                        height: 160,
+                        objectFit: "cover",
+                        transition: "transform 0.3s ease",
+                      }}
                     />
                   </Link>
                   
-                  {/* CONTENT BELOW IMAGE */}
-                  <div style={infoStyle}>
+                  {/* CONTENT */}
+                  <div style={{ padding: "14px 16px 16px 16px", textAlign: "left", flexGrow: 1 }}>
                     <Link to={`/item-details/${item.nftId}`}>
-                      <h4 style={{ 
-                        fontWeight: 700, 
-                        fontSize: "1.12rem", 
-                        marginBottom: 8, 
-                        color: "#212529" 
+                      <h4 style={{
+                        fontWeight: 700,
+                        fontSize: "1rem",
+                        marginBottom: 6,
+                        color: "#212529",
+                        lineHeight: 1.2,
                       }}>
                         {item.title}
                       </h4>
                     </Link>
-                    <div style={{ 
-                      fontSize: "1rem", 
-                      color: "#007bff", 
-                      fontWeight: 600, 
-                      marginBottom: 8 
+                    <div style={{
+                      fontSize: "0.95rem",
+                      color: "#007bff",
+                      fontWeight: 600,
+                      marginBottom: 6
                     }}>
                       {item.price} ETH
                     </div>
-                    <div style={{ 
-                      fontSize: "0.9rem", 
-                      color: "#6c757d", 
-                      display: "flex", 
-                      alignItems: "center", 
-                      gap: 6 
+                    <div style={{
+                      fontSize: "0.85rem",
+                      color: "#6c757d",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 5
                     }}>
-                      <i className="fa fa-heart" style={{ fontSize: "14px", color: "#ccc" }}></i>
+                      <i className="fa fa-heart" style={{ fontSize: "12px", color: "#ccc" }}></i>
                       <span>{item.likes}</span>
                     </div>
                   </div>
@@ -305,22 +234,57 @@ const NewItems = () => {
               </div>
             ))}
           </div>
-          {loaded && instanceRef.current && items.length > 0 && (
+
+          {loaded && instanceRef.current && (
             <>
               <div
-                style={getArrowStyle("left")}
-                onClick={e => {
-                  e.stopPropagation();
-                  instanceRef.current?.prev();
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  left: "-25px",
+                  width: 45,
+                  height: 45,
+                  backgroundColor: "#fff",
+                  border: "1px solid #e0e0e0",
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 20,
+                  color: "#444",
+                  zIndex: 15,
+                  boxShadow: "0 3px 15px rgba(0,0,0,0.1)",
                 }}
-              >&#8249;</div>
+                onClick={() => instanceRef.current?.prev()}
+              >
+                &#8249;
+              </div>
               <div
-                style={getArrowStyle("right")}
-                onClick={e => {
-                  e.stopPropagation();
-                  instanceRef.current?.next();
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  right: "-25px",
+                  width: 45,
+                  height: 45,
+                  backgroundColor: "#fff",
+                  border: "1px solid #e0e0e0",
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 20,
+                  color: "#444",
+                  zIndex: 15,
+                  boxShadow: "0 3px 15px rgba(0,0,0,0.1)",
                 }}
-              >&#8250;</div>
+                onClick={() => instanceRef.current?.next()}
+              >
+                &#8250;
+              </div>
             </>
           )}
         </div>
@@ -330,6 +294,7 @@ const NewItems = () => {
 };
 
 export default NewItems;
+
 
 
 

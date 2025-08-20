@@ -35,13 +35,13 @@ const ItemDetails = () => {
         description: "doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.",
         views: 100,
         likes: 74,
-        price: "1.85",
-        ownerName: "Monica Lucas",
+        price: "0.29",
+        ownerName: "Mamie Barnett",
         ownerImage: AuthorImage,
         ownerId: "73855012",
-        creatorName: "Monica Lucas", 
+        creatorName: "Jimmy Wright", 
         creatorImage: AuthorImage,
-        creatorId: "73855012"
+        creatorId: "73855013"
       });
     }
     setLoading(false);
@@ -122,56 +122,157 @@ const ItemDetails = () => {
                     {item.description || "No description available for this NFT."}
                   </p>
                   
-                  <div className="d-flex flex-row">
-                    <div className="mr40">
-                      <h6>Owner</h6>
-                      <div className="item_author">
-                        <div className="author_list_pp">
+                  {/* ENHANCED OWNER/CREATOR SECTION */}
+                  <div style={{ 
+                    marginTop: "30px", 
+                    padding: "20px 0"
+                  }}>
+                    {/* Owner Section */}
+                    <div style={{ marginBottom: "32px" }}>
+                      <h6 style={{ 
+                        fontSize: "20px", 
+                        fontWeight: 700, 
+                        marginBottom: "12px",
+                        color: "#333"
+                      }}>
+                        Owner
+                      </h6>
+                      <div style={{ 
+                        display: "flex", 
+                        alignItems: "center", 
+                        gap: "12px"  // Increased from 6px to 12px - names scooted over
+                      }}>
+                        <div style={{ position: "relative" }}>
                           <Link to={`/author/${item.ownerId}`}>
                             <img 
                               className="lazy" 
                               src={item.ownerImage || AuthorImage} 
-                              alt={item.ownerName} 
+                              alt={item.ownerName}
+                              style={{ 
+                                width: "75px", 
+                                height: "75px", 
+                                borderRadius: "50%" 
+                              }}
                             />
-                            <i className="fa fa-check"></i>
+                            <i className="fa fa-check" style={{
+                              position: "absolute",
+                              bottom: 0,
+                              right: 0,
+                              background: "#7e56da",
+                              color: "#fff",
+                              borderRadius: "50%",
+                              width: "20px",
+                              height: "20px",
+                              fontSize: "10px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              border: "3px solid #fff",
+                            }}></i>
                           </Link>
                         </div>
-                        <div className="author_list_info">
+                        <div>
                           <Link to={`/author/${item.ownerId}`}>
-                            {item.ownerName || "Unknown Owner"}
+                            <span style={{ 
+                              fontWeight: 700, 
+                              fontSize: "20px", 
+                              color: "#212529",
+                              textDecoration: "none"
+                            }}>
+                              {item.ownerName || "Unknown Owner"}
+                            </span>
                           </Link>
                         </div>
                       </div>
                     </div>
-                    <div></div>
-                  </div>
-                  
-                  <div className="de_tab tab_simple">
-                    <div className="de_tab_content">
-                      <h6>Creator</h6>
-                      <div className="item_author">
-                        <div className="author_list_pp">
+
+                    {/* Creator Section */}
+                    <div style={{ marginBottom: "32px" }}>
+                      <h6 style={{ 
+                        fontSize: "20px", 
+                        fontWeight: 700, 
+                        marginBottom: "12px",
+                        color: "#333"
+                      }}>
+                        Creator
+                      </h6>
+                      <div style={{ 
+                        display: "flex", 
+                        alignItems: "center", 
+                        gap: "12px"  // Increased from 6px to 12px - names scooted over
+                      }}>
+                        <div style={{ position: "relative" }}>
                           <Link to={`/author/${item.creatorId}`}>
                             <img 
                               className="lazy" 
                               src={item.creatorImage || AuthorImage} 
-                              alt={item.creatorName} 
+                              alt={item.creatorName}
+                              style={{ 
+                                width: "75px", 
+                                height: "75px", 
+                                borderRadius: "50%" 
+                              }}
                             />
-                            <i className="fa fa-check"></i>
+                            <i className="fa fa-check" style={{
+                              position: "absolute",
+                              bottom: 0,
+                              right: 0,
+                              background: "#7e56da",
+                              color: "#fff",
+                              borderRadius: "50%",
+                              width: "20px",
+                              height: "20px",
+                              fontSize: "10px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              border: "3px solid #fff",
+                            }}></i>
                           </Link>
                         </div>
-                        <div className="author_list_info">
+                        <div>
                           <Link to={`/author/${item.creatorId}`}>
-                            {item.creatorName || "Unknown Creator"}
+                            <span style={{ 
+                              fontWeight: 700, 
+                              fontSize: "20px", 
+                              color: "#212529",
+                              textDecoration: "none"
+                            }}>
+                              {item.creatorName || "Unknown Creator"}
+                            </span>
                           </Link>
                         </div>
                       </div>
                     </div>
-                    <div className="spacer-40"></div>
-                    <h6>Price</h6>
-                    <div className="nft-item-price">
-                      <img src={EthImage} alt="Ethereum" />
-                      <span>{item.price || "N/A"}</span>
+
+                    {/* Price Section */}
+                    <div>
+                      <h6 style={{ 
+                        fontSize: "20px", 
+                        fontWeight: 700, 
+                        marginBottom: "12px",
+                        color: "#333"
+                      }}>
+                        Price
+                      </h6>
+                      <div style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px"
+                      }}>
+                        <img 
+                          src={EthImage} 
+                          alt="Ethereum" 
+                          style={{ width: "32px", height: "32px" }}
+                        />
+                        <span style={{
+                          fontWeight: 700,
+                          fontSize: "28px",
+                          color: "#212529"
+                        }}>
+                          {item.price || "N/A"}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -185,9 +286,6 @@ const ItemDetails = () => {
 };
 
 export default ItemDetails;
-
-
-
 
 
 
