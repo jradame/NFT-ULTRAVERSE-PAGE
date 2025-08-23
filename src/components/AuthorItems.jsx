@@ -37,16 +37,16 @@ const AuthorItems = ({ authorData }) => {
 
   const calculateCountdown = (expiryDate, itemId) => {
     if (!expiryDate) return "EXPIRED";
-    
+
     const now = currentTime.getTime();
     const expiry = new Date(expiryDate).getTime();
     const difference = expiry - now;
-    
+
     if (difference > 0) {
       const hours = Math.floor(difference / (1000 * 60 * 60));
       const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-      
+
       if (hours > 0) {
         return `${hours}h ${minutes}m ${seconds}s`;
       } else {
@@ -54,15 +54,15 @@ const AuthorItems = ({ authorData }) => {
       }
     } else {
       const newExpiry = Date.now() + Math.random() * 24 * 60 * 60 * 1000;
-      
-      setItems(prevItems => 
-        prevItems.map(item => 
-          item.id === itemId 
+
+      setItems(prevItems =>
+        prevItems.map(item =>
+          item.id === itemId
             ? { ...item, expiryDate: newExpiry }
             : item
         )
       );
-      
+
       return "RESETTING...";
     }
   };
@@ -96,7 +96,7 @@ const AuthorItems = ({ authorData }) => {
                     </Link>
                   </div>
                   {/* UPDATED: Bigger and bolder timer text */}
-                  <div 
+                  <div
                     className="de_countdown"
                     style={{
                       background: "rgba(255,255,255,0.95)",
